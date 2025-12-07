@@ -31,6 +31,7 @@ class HrisPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Amber,
             ])
+            ->font('Poppins')
             ->discoverResources(in: app_path('Filament/Hris/Resources'), for: 'App\Filament\Hris\Resources')
             ->discoverPages(in: app_path('Filament/Hris/Pages'), for: 'App\Filament\Hris\Pages')
             ->pages([

@@ -8,4 +8,14 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    build: {
+        chunkSizeWarningLimit: 1000,
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    vendor: ['three'],
+                },
+            },
+        },
+    },
 });
