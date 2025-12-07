@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  db:
+    image: mariadb:10.6
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: pi7890
+      MYSQL_DATABASE: hris_db
+      MYSQL_USER: hris_merdeka
+      MYSQL_PASSWORD: hris_pi7890
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./schema.sql:/docker-entrypoint-initdb.d/init.sql
+      - mariadb_data:/var/lib/mysql
+
+volumes:
+  mariadb_data:
