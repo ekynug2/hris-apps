@@ -6,5 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class OrganizationUnit extends Model
 {
-    protected $guarded = [];
+    protected $fillable = [
+        'name',
+        'type',
+        'parent_id',
+        'meta',
+    ];
 }
