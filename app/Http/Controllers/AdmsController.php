@@ -621,6 +621,49 @@ class AdmsController extends Controller
                     ]);
                 }
             }
+
+            // Check if body contains stats (UserCount, etc.)
+            // The logs show the body contains "~DeviceName=...", "UserCount=39", etc.
+            // separated by newlines.
+            if (str_contains($content, 'UserCount=') || str_contains($content, 'FPCount=')) {
+                $updateData = [];
+                // Split by newline
+                $lines = explode("\n", $content);
+                foreach ($lines as $line) {
+                    $line = trim($line);
+                    if (empty($line) || str_starts_with($line, '~'))
+                        continue; // Skip empty or params starting with ~ if not needed (though some like ~SerialNumber might be useful, we use standard keys)
+
+                    if (str_contains($line, '=')) {
+                        [$key, $value] = explode('=', $line, 2);
+                        $key = trim($key);
+                        $value = trim($value);
+
+                        if (strcasecmp($key, 'UserCount') === 0)
+                            $updateData['user_count'] = $value;
+                        if (strcasecmp($key, 'FPCount') === 0)
+                            $updateData['fp_count'] = $value;
+                        if (strcasecmp($key, 'FaceCount') === 0)
+                            $updateData['face_count'] = $value;
+                        if (strcasecmp($key, 'TransactionCount') === 0)
+                            $updateData['transaction_count'] = $value;
+                        if (strcasecmp($key, 'FWVersion') === 0)
+                            $updateData['fw_ver'] = $value;
+                        if (strcasecmp($key, 'PushVersion') === 0)
+                            $updateData['push_version'] = $value;
+                        if (strcasecmp($key, 'IPAddress') === 0)
+                            $updateData['ip_address'] = $value;
+                    }
+                }
+
+                if (!empty($updateData)) {
+                    $device = Device::where('sn', $sn)->first();
+                    if ($device) {
+                        $device->update($updateData);
+                        Log::info("Device Stats Updated from CMD Feedback for $sn: " . json_encode($updateData));
+                    }
+                }
+            }
         }
 
         return "OK";
