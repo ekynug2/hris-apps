@@ -17,7 +17,10 @@ class LatestAttendance extends BaseWidget
     {
         return $table
             ->query(
-                Attendance::query()->latest('created_at')->limit(5)
+                Attendance::query()
+                    ->whereDate('date', now())
+                    ->orderBy('clock_in', 'desc')
+                    ->limit(5)
             )
             ->columns([
                 Tables\Columns\TextColumn::make('employee.first_name')

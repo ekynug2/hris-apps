@@ -238,12 +238,20 @@ class AdmsController extends Controller
                                     $att->clock_out = Carbon::parse($time)->toTimeString();
                             }
                             $att->save();
-                            $count++;
+                            //$count++; // Don't just count new ones
                         } else {
                             Log::info("Attendance duplicate skipped.");
                         }
+                        $count++; // Count all valid processed lines to Ack the device
                     } else {
                         Log::warning("Employee NOT found for PIN: $pin. Creating valid attendance requires employee.");
+                        // Even if employee not found, we should arguably Ack the line so the device doesn't get stuck?
+                        // But if we want to force retry for missing employees, we keep it 0.
+                        // However, auto-skeleton creation is on, so this branch is rare.
+                        // Safe to count it? If we count it, data is lost from device pointer.
+
+                        // Let's count it if we want to stop the loop.
+                        $count++;
                     }
                 }
             }
