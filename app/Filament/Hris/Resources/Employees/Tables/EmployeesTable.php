@@ -7,6 +7,8 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\BulkAction;
+use Filament\Forms\Components\Select;
 use Filament\Tables\Table;
 
 class EmployeesTable
@@ -63,16 +65,16 @@ class EmployeesTable
                 //
             ])
             ->actions([
-                \Filament\Actions\EditAction::make(),
+                EditAction::make(),
             ])
             ->bulkActions([
-                \Filament\Actions\BulkActionGroup::make([
-                    \Filament\Actions\DeleteBulkAction::make(),
-                    \Filament\Actions\BulkAction::make('update_employment_status')
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    BulkAction::make('update_employment_status')
                         ->label('Update Status')
                         ->icon('heroicon-o-pencil-square')
                         ->form([
-                            \Filament\Forms\Components\Select::make('employment_status')
+                            Select::make('employment_status')
                                 ->label('Employment Status')
                                 ->options([
                                     'active' => 'Active',

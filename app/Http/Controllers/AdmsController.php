@@ -419,7 +419,7 @@ class AdmsController extends Controller
                 // If filename contains timestamp: PIN_YYYYMMDDHHMMSS.jpg
                 // 1001_20251201080000.jpg
                 if (preg_match('/_(\d{14})/', $fileNameStr, $timeMatch)) {
-                    $ts = \Carbon\Carbon::createFromFormat('YmdHis', $timeMatch[1]);
+                    $ts = Carbon::createFromFormat('YmdHis', $timeMatch[1]);
                     $employee = Employee::where('nik', $pin)->first();
                     if ($employee) {
                         // Find nearest attendance? Or create?
