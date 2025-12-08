@@ -33,7 +33,7 @@ A comprehensive Human Resource Information System (HRIS) application built with 
 
 1.  **Clone the repository**:
     ```bash
-    git clone https://github.com/nimpo/hris-apps.git
+    git clone https://github.com/ekynug2/hris-apps.git
     cd hris-apps
     ```
 
