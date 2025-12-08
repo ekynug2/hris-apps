@@ -75,7 +75,7 @@ class AdmsController extends Controller
         // If table=ATTLOG, it's attendance
         $table = $request->query('table');
 
-        Log::info("ADMS: Data Push SN: $sn | Table: $table");
+        Log::info("ADMS: Data Push SN: $sn | Table: $table | Query: " . json_encode($request->all()));
 
         if (!$sn)
             return "Error";
@@ -93,12 +93,15 @@ class AdmsController extends Controller
             // Handle Device Info / Options Update
             // Some devices send table=INFO, others table=options
             // Or sometimes the data is just present in the body of other requests.
+            // Also check query param 'options' if table is empty
+            $options = $request->query('options');
+
             $body = $request->getContent();
             $shouldParseStats = false;
 
-            if (strcasecmp($table, 'INFO') === 0 || strcasecmp($table, 'options') === 0) {
+            if (strcasecmp($table, 'INFO') === 0 || strcasecmp($table, 'options') === 0 || (!empty($options))) {
                 $shouldParseStats = true;
-                Log::info("ADMS Parsing $table: " . $body);
+                Log::info("ADMS Parsing $table (options=$options): " . $body);
             } elseif (str_contains($body, 'UserCount=') || str_contains($body, 'FPCount=')) {
                 // heuristic: if body has these keys, parse it anyway
                 $shouldParseStats = true;
@@ -106,6 +109,20 @@ class AdmsController extends Controller
             }
 
             if ($shouldParseStats) {
+                // Check Query Params first for stats (some devices send them in URL)
+                if ($request->has('UserCount'))
+                    $updateData['user_count'] = $request->query('UserCount');
+                if ($request->has('FPCount'))
+                    $updateData['fp_count'] = $request->query('FPCount');
+                if ($request->has('FaceCount'))
+                    $updateData['face_count'] = $request->query('FaceCount');
+                if ($request->has('TransactionCount'))
+                    $updateData['transaction_count'] = $request->query('TransactionCount');
+                if ($request->has('FWVersion'))
+                    $updateData['fw_ver'] = $request->query('FWVersion');
+                if ($request->has('PushVersion'))
+                    $updateData['push_version'] = $request->query('PushVersion');
+
                 // Content is typically Key=Value pairs, separated by tabs, newlines, or commas
                 $parsedStats = [];
                 $pairs = preg_split('/[\t\n,]/', $body);
