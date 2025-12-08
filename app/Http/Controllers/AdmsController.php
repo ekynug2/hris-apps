@@ -192,7 +192,7 @@ class AdmsController extends Controller
                         $status = $data[2] ?? 0;
                     }
 
-                    Log::info("Processing PIN: $pin, Time: $time");
+                    // Log::info("Processing PIN: $pin, Time: $time");
 
                     // Find employee
                     $employee = Employee::where('nik', $pin)->first();
@@ -217,7 +217,7 @@ class AdmsController extends Controller
                     }
 
                     if ($employee) {
-                        Log::info("Employee Found: {$employee->first_name}");
+                        // Log::info("Employee Found: {$employee->first_name}");
                         $exists = Attendance::where('employee_id', $employee->id)
                             ->where('date', Carbon::parse($time)->toDateString())
                             ->where('clock_in', Carbon::parse($time)->toTimeString())
@@ -240,11 +240,11 @@ class AdmsController extends Controller
                             $att->save();
                             //$count++; // Don't just count new ones
                         } else {
-                            Log::info("Attendance duplicate skipped.");
+                            // Log::info("Attendance duplicate skipped.");
                         }
                         $count++; // Count all valid processed lines to Ack the device
                     } else {
-                        Log::warning("Employee NOT found for PIN: $pin. Creating valid attendance requires employee.");
+                        // Log::warning("Employee NOT found for PIN: $pin. Creating valid attendance requires employee.");
                         // Even if employee not found, we should arguably Ack the line so the device doesn't get stuck?
                         // But if we want to force retry for missing employees, we keep it 0.
                         // However, auto-skeleton creation is on, so this branch is rare.
