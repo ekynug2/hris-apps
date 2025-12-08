@@ -90,37 +90,61 @@ class AdmsController extends Controller
                 'last_activity' => now()
             ];
 
-            // If it's an INFO table push
-            if ($table == 'INFO') {
-                $body = $request->getContent();
-                Log::info("ADMS Parsing INFO Table: " . $body);
+            // Handle Device Info / Options Update
+            // Some devices send table=INFO, others table=options
+            // Or sometimes the data is just present in the body of other requests.
+            $body = $request->getContent();
+            $shouldParseStats = false;
 
-                // Content is typically Key=Value pairs, separated by tabs or newlines
-                // Example: UserCount=10\tFPCount=20\t...
+            if (strcasecmp($table, 'INFO') === 0 || strcasecmp($table, 'options') === 0) {
+                $shouldParseStats = true;
+                Log::info("ADMS Parsing $table: " . $body);
+            } elseif (str_contains($body, 'UserCount=') || str_contains($body, 'FPCount=')) {
+                // heuristic: if body has these keys, parse it anyway
+                $shouldParseStats = true;
+                Log::info("ADMS Parsing Implicit Stats from $table: " . substr($body, 0, 100));
+            }
 
-                // We use preg_split to handle both tabs and potential newlines or spaces
-                $pairs = preg_split('/[\t\n]/', $body);
+            if ($shouldParseStats) {
+                // Content is typically Key=Value pairs, separated by tabs, newlines, or commas
+                $parsedStats = [];
+                $pairs = preg_split('/[\t\n,]/', $body);
 
                 foreach ($pairs as $pair) {
                     if (str_contains($pair, '=')) {
-                        [$key, $value] = explode('=', trim($pair), 2);
+                        [$k, $v] = explode('=', trim($pair), 2);
+                        $key = trim($k);
+                        $value = trim($v);
 
-                        if ($key == 'UserCount')
-                            $updateData['user_count'] = $value;
-                        if ($key == 'FPCount')
-                            $updateData['fp_count'] = $value;
-                        if ($key == 'FaceCount')
-                            $updateData['face_count'] = $value;
-                        if ($key == 'TransactionCount')
-                            $updateData['transaction_count'] = $value;
-                        if ($key == 'FWVersion')
-                            $updateData['fw_ver'] = $value;
-                        // Add more mappings if needed
+                        if (strcasecmp($key, 'UserCount') === 0)
+                            $parsedStats['user_count'] = $value;
+                        if (strcasecmp($key, 'FPCount') === 0)
+                            $parsedStats['fp_count'] = $value;
+                        if (strcasecmp($key, 'FaceCount') === 0)
+                            $parsedStats['face_count'] = $value;
+                        if (strcasecmp($key, 'TransactionCount') === 0)
+                            $parsedStats['transaction_count'] = $value;
+                        if (strcasecmp($key, 'FWVersion') === 0)
+                            $parsedStats['fw_ver'] = $value;
+                        if (strcasecmp($key, 'IPAddress') === 0)
+                            $parsedStats['ip_address'] = $value;
                     }
                 }
-            }
 
-            $device->update($updateData);
+                if (!empty($parsedStats)) {
+                    $device->update(array_merge($updateData, $parsedStats)); // Merge with existing updateData
+                    Log::info("Device Stats Updated for $sn: " . json_encode($parsedStats));
+                    if (strcasecmp($table, 'INFO') === 0 || strcasecmp($table, 'options') === 0) {
+                        return "OK";
+                    }
+                } else {
+                    // If no specific stats were parsed from the body, still update activity and IP
+                    $device->update($updateData);
+                }
+            } else {
+                // If not parsing stats from body, just update activity and IP
+                $device->update($updateData);
+            }
         }
 
         if ($table == 'ATTLOG') {
@@ -555,7 +579,7 @@ class AdmsController extends Controller
     public function devicecmd(Request $request)
     {
         $sn = $request->query('SN');
-        Log::info("ADMS: Device Cmd Feedback SN: $sn");
+        Log::info("ADMS: Device Cmd Feedback SN: $sn | Body: " . $request->getContent() . " | Query: " . json_encode($request->all()));
 
         // Body typically: ID=1&Return=0&CMD=DATA
         // Process POST data
