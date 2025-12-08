@@ -22,7 +22,7 @@ class AttendancesTable
                     ->label('NIK')
                     ->searchable(),
                 TextColumn::make('employee.first_name')
-                    ->label('First Name')
+                    ->label('Name')
                     ->searchable(),
                 TextColumn::make('date')
                     ->date()
@@ -73,7 +73,7 @@ class AttendancesTable
                     ->exports([
                         \pxlrbt\FilamentExcel\Exports\ExcelExport::make()
                             ->fromTable()
-                            ->withFilename('attendances-' . date('Y-m-d'))
+                            ->withFilename('attendances -' . date('Y-m-d H:i:s'))
                             ->withColumns([
                                 \pxlrbt\FilamentExcel\Columns\Column::make('employee.nik')->heading('NIK'),
                                 \pxlrbt\FilamentExcel\Columns\Column::make('employee.first_name')->heading('Name'),
