@@ -12,4 +12,5 @@ class OrganizationUnit extends Model
         'parent_id',
         'meta',
     ];
+
 }

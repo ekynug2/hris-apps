@@ -14,24 +14,29 @@ class AttendancesTable
     {
         return $table
             ->columns([
+                TextColumn::make('employee.nik')
+                    ->label('NIK')
+                    ->searchable(),
+                TextColumn::make('employee.first_name')
+                    ->label('First Name')
+                    ->searchable(),
                 TextColumn::make('date')
                     ->date()
                     ->sortable(),
                 TextColumn::make('clock_in')
                     ->time()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('clock_out')
                     ->time()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('status')
                     ->badge(),
-                TextColumn::make('employee_id')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('lat')
-                    ->searchable(),
-                TextColumn::make('lng')
-                    ->searchable(),
+                //TextColumn::make('lat')
+                //    ->searchable(),
+                //TextColumn::make('lng')
+                //    ->searchable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -44,12 +49,13 @@ class AttendancesTable
             ->filters([
                 //
             ])
-            ->recordActions([
-                EditAction::make(),
+            ->actions([
+                // No edit action as per requirement
+                \Filament\Actions\DeleteAction::make(),
             ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+            ->bulkActions([
+                \Filament\Actions\BulkActionGroup::make([
+                    \Filament\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }

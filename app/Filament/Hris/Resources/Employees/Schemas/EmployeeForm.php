@@ -32,12 +32,12 @@ class EmployeeForm
                 DatePicker::make('termination_date'),
                 Select::make('employment_status')
                     ->options([
-            'active' => 'Active',
-            'on_probation' => 'On probation',
-            'on_notice' => 'On notice',
-            'resigned' => 'Resigned',
-            'terminated' => 'Terminated',
-        ])
+                        'active' => 'Active',
+                        'on_probation' => 'On probation',
+                        'on_notice' => 'On notice',
+                        'resigned' => 'Resigned',
+                        'terminated' => 'Terminated',
+                    ])
                     ->default('on_probation')
                     ->required(),
                 Toggle::make('is_blacklisted')
@@ -61,6 +61,16 @@ class EmployeeForm
                 Textarea::make('custom_fields')
                     ->default(null)
                     ->columnSpanFull(),
+                Select::make('device_privilege')
+                    ->label('Device Privilege')
+                    ->options([
+                        0 => 'Normal User',
+                        2 => 'Registrar', // Common ZK value
+                        6 => 'System Admin',
+                        14 => 'Super Admin',
+                    ])
+                    ->default(0)
+                    ->helperText('Access level on the physical attendance device. 0=User, 14=Admin'),
             ]);
     }
 }

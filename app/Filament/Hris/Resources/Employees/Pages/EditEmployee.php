@@ -16,4 +16,8 @@ class EditEmployee extends EditRecord
             DeleteAction::make(),
         ];
     }
+    public function getMaxContentWidth(): ?string
+    {
+        return 'full';
+    }
 }

@@ -16,4 +16,8 @@ class ListEmployees extends ListRecords
             CreateAction::make(),
         ];
     }
+    public function getMaxContentWidth(): ?string
+    {
+        return 'full';
+    }
 }

@@ -20,7 +20,7 @@ class AdmsController extends Controller
     {
         $sn = $request->query('SN');
 
-        Log::info("ADMS: Device Registry SN: $sn");
+        Log::info("ADMS: Device Registry SN: $sn | Query: " . json_encode($request->all()));
 
         if ($sn) {
             $device = Device::firstOrCreate(
@@ -28,12 +28,35 @@ class AdmsController extends Controller
                 [
                     'ip_address' => $request->ip(),
                     'last_activity' => now(),
+                    // Initial Create defaults
                     'push_version' => $request->input('pushver'),
                     'dev_language' => $request->input('language'),
                 ]
             );
 
-            $device->update(['last_activity' => now()]);
+            // Update details from registry params (activity, IP, FW, counts)
+            $updateData = [
+                'last_activity' => now(),
+                'ip_address' => $request->ip(),
+            ];
+
+            // Common ZK params
+            if ($request->has('pushver'))
+                $updateData['push_version'] = $request->input('pushver');
+            if ($request->has('language'))
+                $updateData['dev_language'] = $request->input('language');
+            if ($request->has('FWVersion'))
+                $updateData['fw_ver'] = $request->input('FWVersion');
+            if ($request->has('UserCount'))
+                $updateData['user_count'] = $request->input('UserCount');
+            if ($request->has('FPCount'))
+                $updateData['fp_count'] = $request->input('FPCount');
+            if ($request->has('FaceCount'))
+                $updateData['face_count'] = $request->input('FaceCount');
+            if ($request->has('TransactionCount'))
+                $updateData['transaction_count'] = $request->input('TransactionCount');
+
+            $device->update($updateData);
 
             // Standard registry query response
             return "Registry=1\nRegistryCode=1\nServerVersion=1.0\n";
@@ -59,16 +82,30 @@ class AdmsController extends Controller
 
         $device = Device::where('sn', $sn)->first();
         if ($device) {
-            $device->update([
+            // Update stats if provided in query string (often sent with INFO command or heartbeat)
+            // But cdata might just have table.
+
+            $updateData = [
                 'ip_address' => $request->ip(),
                 'last_activity' => now()
-            ]);
+            ];
+
+            // If it's an INFO table push
+            if ($table == 'INFO') {
+                $body = $request->getContent();
+                // INFO data often key=value pairs
+                // Count=...
+                // Implement parsing similar to registry if body has content
+
+                // Or sometimes passed as query params?
+            }
+
+            $device->update($updateData);
         }
 
         if ($table == 'ATTLOG') {
             $body = $request->getContent();
-            // Lines are standard: ID  timestamp  status  ...
-            // Or tab separated depending on fw.
+            Log::info("ADMS Parsing Body: " . substr($body, 0, 200) . "...");
 
             $lines = explode("\n", $body);
             $count = 0;
@@ -77,52 +114,60 @@ class AdmsController extends Controller
                 if (empty(trim($line)))
                     continue;
 
-                // Format: PIN  Time  Status  Verify  WorkCode  Reserved  Reserved
-                // Split by tab or space
-                $data = preg_split('/\s+/', trim($line));
+                // ATTLOG is usually tab separated
+                $data = explode("\t", trim($line));
+                if (count($data) < 2) {
+                    // Fallback to space split if tab fails
+                    $data = preg_split('/\s+/', trim($line));
+                }
 
                 if (count($data) >= 2) {
                     $pin = $data[0];
                     $time = $data[1];
                     if (isset($data[2]) && preg_match('/\d{2}:\d{2}:\d{2}/', $data[2])) {
-                        // Sometimes time is split into date time
                         $time .= ' ' . $data[2];
                         $status = $data[3] ?? 0;
                     } else {
                         $status = $data[2] ?? 0;
                     }
 
+                    Log::info("Processing PIN: $pin, Time: $time");
+
                     // Find employee
                     $employee = Employee::where('nik', $pin)->first();
-                    // Or search by ID if nik is numeric match
                     if (!$employee && is_numeric($pin)) {
                         $employee = Employee::find($pin);
                     }
 
+                    // Auto-create Skeleton Employee if missing (User Request: Source from machine)
+                    if (!$employee) {
+                        Log::info("Auto-creating skeleton employee for PIN: $pin");
+                        $defaultPosition = \App\Models\Position::first();
+                        $employee = Employee::create([
+                            'nik' => $pin,
+                            'first_name' => 'Device User ' . $pin,
+                            'last_name' => '',
+                            'email' => null,
+                            'date_of_birth' => '1990-01-01', // Default
+                            'gender' => 'male', // Default
+                            'hire_date' => now(), // Default
+                            'position_id' => $defaultPosition?->id ?? 1, // Fallback
+                        ]);
+                    }
+
                     if ($employee) {
-                        // Check duplicate
+                        Log::info("Employee Found: {$employee->first_name}");
                         $exists = Attendance::where('employee_id', $employee->id)
                             ->where('date', Carbon::parse($time)->toDateString())
                             ->where('clock_in', Carbon::parse($time)->toTimeString())
-                            ->exists(); // Strict duplicate check logic might differ
+                            ->exists();
 
                         if (!$exists) {
-                            // Simple logic: insert as generic attendance
-                            // In real system, logic to determine IN/OUT based on time or status
-                            // Status: 0=CheckIn, 1=CheckOut, etc (varies by device)
-
-                            // For this MVP, we just create a record.
-                            // Better logic: Find attendance for that day
                             $date = Carbon::parse($time)->toDateString();
                             $att = Attendance::firstOrCreate(
                                 ['employee_id' => $employee->id, 'date' => $date],
                                 ['status' => 'present']
                             );
-
-                            // 0/4/5 => Check IN usually
-                            // 1 => Check OUT usually
-                            // But let's assume raw log processing.
-                            // We update clock_in if empty, else clock_out (simple logic)
 
                             if (in_array($status, ['0', '4', '5'])) {
                                 if (!$att->clock_in)
@@ -133,8 +178,296 @@ class AdmsController extends Controller
                             }
                             $att->save();
                             $count++;
+                        } else {
+                            Log::info("Attendance duplicate skipped.");
+                        }
+                    } else {
+                        Log::warning("Employee NOT found for PIN: $pin. Creating valid attendance requires employee.");
+                    }
+                }
+            }
+            return "OK:$count";
+        }
+
+        // --- NEW BLOCKS FOR ADVANCED FEATURES ---
+
+        // 1. Biometric Templates (FP)
+        if ($table == 'FP' || $table == 'BIODATA') {
+            $body = $request->getContent();
+            Log::info("ADMS Parsing $table: " . substr($body, 0, 100));
+            $lines = explode("\n", $body);
+            $count = 0;
+            foreach ($lines as $line) {
+                if (empty(trim($line)))
+                    continue;
+                // Format: PIN=1 FID=1 Size=1408 Valid=1 TMP=...
+                $parts = explode("\t", trim($line));
+                $data = [];
+                foreach ($parts as $part) {
+                    if (str_contains($part, '=')) {
+                        [$k, $v] = explode('=', $part, 2);
+                        $data[$k] = $v;
+                    }
+                }
+
+                $pin = $data['PIN'] ?? $data['Pin'] ?? null;
+                $fid = $data['FID'] ?? $data['Fid'] ?? 0;
+                // Some firmwares send 'No' instead of FID
+                if (!$fid && isset($data['No']))
+                    $fid = $data['No'];
+
+                $tmp = $data['TMP'] ?? $data['Tmp'] ?? null;
+
+                if ($pin && $tmp) {
+                    \App\Models\BioTemplate::updateOrCreate(
+                        [
+                            'employee_nik' => $pin,
+                            'type' => 1, // FP
+                            'no' => $fid,
+                        ],
+                        [
+                            'size' => $data['Size'] ?? $data['SIZE'] ?? strlen($tmp),
+                            'valid' => $data['Valid'] ?? 1,
+                            'content' => $tmp,
+                            'version' => '10.0', // Detection logic needed if multiple versions
+                            'device_sn' => $sn,
+                        ]
+                    );
+                    $count++;
+                }
+            }
+            return "OK:$count";
+        }
+
+        // 2. Face Templates (FACE)
+        if ($table == 'FACE') {
+            $body = $request->getContent();
+            Log::info("ADMS Parsing FACE: " . substr($body, 0, 100));
+            $lines = explode("\n", $body);
+            $count = 0;
+            foreach ($lines as $line) {
+                if (empty(trim($line)))
+                    continue;
+                // Format: PIN=1 FID=0 SIZE=123 VALID=1 TMP=...
+                // Sometimes FACE start with "FACE PIN=..."
+                if (str_starts_with($line, 'FACE '))
+                    $line = substr($line, 5);
+
+                $parts = explode("\t", trim($line));
+                $data = [];
+                foreach ($parts as $part) {
+                    if (str_contains($part, '=')) {
+                        [$k, $v] = explode('=', $part, 2);
+                        $data[$k] = $v;
+                    }
+                }
+
+                $pin = $data['PIN'] ?? null;
+                $fid = $data['FID'] ?? 0;
+                $tmp = $data['TMP'] ?? null;
+
+                if ($pin && $tmp) {
+                    \App\Models\BioTemplate::updateOrCreate(
+                        [
+                            'employee_nik' => $pin,
+                            'type' => 9, // FACE
+                            'no' => $fid,
+                        ],
+                        [
+                            'size' => $data['SIZE'] ?? strlen($tmp),
+                            'valid' => $data['VALID'] ?? 1,
+                            'content' => $tmp,
+                            'device_sn' => $sn,
+                        ]
+                    );
+                    $count++;
+                }
+            }
+            return "OK:$count";
+        }
+
+        // 3. User Photos (USERPIC)
+        if ($table == 'USERPIC') {
+            // USERPIC data is binary in body, usually with CMD=uploadphoto line
+            // But in some ADMS push, it's just raw multipart or stream.
+            // PushDemo suggests stream reading.
+            // The format from PushDemo:
+            // Line 1: CMD=uploadphoto
+            // Line 2: PIN=1
+            // Line 3: FileName=1.jpg
+            // Line 4: Size=1234
+            // Line 5: Content=... (Binary)
+            // ...
+
+            // PHP input stream
+            $content = file_get_contents("php://input");
+
+            // Allow larger memory for this
+            ini_set('memory_limit', '256M');
+
+            if (preg_match('/PIN=(\d+)/', $content, $pinMatch) && preg_match('/Content=(.*)/s', $content, $contentMatch)) {
+                $pin = $pinMatch[1];
+                $imageData = $contentMatch[1];
+
+                // Save to storage
+                $fileName = "photos/user_{$pin}.jpg";
+                \Illuminate\Support\Facades\Storage::disk('public')->put($fileName, $imageData);
+
+                // Update Employee
+                $employee = Employee::where('nik', $pin)->first();
+                if ($employee) {
+                    $employee->update(['photo_path' => $fileName]);
+                }
+
+                return "OK";
+            }
+
+            return "OK"; // Acknowledge even if fail parsing to stop retry loop
+        }
+
+        // 4. Attendance Photos (ATTPHOTO)
+        if ($table == 'ATTPHOTO') {
+            // Similar to USERPIC but linked to attendance
+            $content = file_get_contents("php://input");
+            // Format often: CMD=uploadphoto\nPIN=1\nSymbol=...\nSize=...\nContent=...
+
+            if (preg_match('/PIN=(\d+)/', $content, $pinMatch) && preg_match('/Content=(.*)/s', $content, $contentMatch)) {
+                $pin = $pinMatch[1];
+                $imageData = $contentMatch[1];
+
+                // Try to find date/time in header if available?
+                // Usually ZK sends the filename as '1_20231010120000.jpg' or similar in 'FileName='
+                // Let's regex the FileName
+                $fileNameStr = "";
+                if (preg_match('/FileName=([^\s]+)/', $content, $fnMatch)) {
+                    $fileNameStr = $fnMatch[1];
+                }
+
+                $storePath = "att_photos/" . ($fileNameStr ?: "att_{$pin}_" . time() . ".jpg");
+                \Illuminate\Support\Facades\Storage::disk('public')->put($storePath, $imageData);
+
+                // Ideally link to 'attendances' table. We need the timestamp.
+                // If filename contains timestamp: PIN_YYYYMMDDHHMMSS.jpg
+                // 1001_20251201080000.jpg
+                if (preg_match('/_(\d{14})/', $fileNameStr, $timeMatch)) {
+                    $ts = \Carbon\Carbon::createFromFormat('YmdHis', $timeMatch[1]);
+                    $employee = Employee::where('nik', $pin)->first();
+                    if ($employee) {
+                        // Find nearest attendance? Or create?
+                        // Usually ATTPHOTO comes AFTER ATTLOG.
+                        $att = Attendance::where('employee_id', $employee->id)
+                            ->whereBetween('created_at', [$ts->copy()->subMinutes(5), $ts->copy()->addMinutes(5)])
+                            ->latest()
+                            ->first();
+
+                        if ($att) {
+                            $att->update(['photo_path' => $storePath]);
                         }
                     }
+                }
+            }
+            return "OK";
+        }
+
+        // 5. Operation Logs (OPERLOG) (Modified handling)
+        // This block is a placeholder in the instruction, it then says to merge.
+        // The final provided code block for `if ($table == 'USERINFO' || $table == 'OPERLOG')`
+        // will contain the merged logic. So, I will *not* add a separate `if ($table == 'OPERLOG')` block here.
+        // Instead, I will replace the *existing* `if ($table == 'OPERLOG' || $table == 'USERINFO')` block.
+
+        if ($table == 'USERINFO' || $table == 'OPERLOG') {
+            // ... (The Logic from previous step) ...
+            // We need to re-include it because replace_file_content overwrites.
+            $body = $request->getContent();
+            Log::info("ADMS Parsing $table Body: " . substr($body, 0, 200));
+            $lines = explode("\n", $body);
+            $count = 0;
+            $defaultPosition = \App\Models\Position::first();
+
+            foreach ($lines as $line) {
+                if (empty(trim($line)))
+                    continue;
+
+                // OPLOG Parsing (Added)
+                if ($table == 'OPERLOG' && str_starts_with($line, 'OPLOG ')) {
+                    $opLine = substr($line, 6);
+                    $parts = preg_split('/\s+/', trim($opLine));
+                    if (count($parts) >= 4) {
+                        $opType = $parts[0];
+                        $operator = $parts[1];
+                        $time = $parts[2] . ' ' . $parts[3];
+
+                        \App\Models\AuditLog::create([
+                            'event_time' => $time,
+                            'event_type' => $opType,
+                            'module' => 'DEVICE_OPLOG',
+                            'description' => "Operation $opType by Operator $operator",
+                            'ip_address' => $request->ip(),
+                            'user_agent' => 'Device ' . $sn,
+                            'is_from_device' => true,
+                            'device_sn' => $sn,
+                            'properties' => [
+                                'operator' => $operator,
+                                'value1' => $parts[4] ?? null,
+                                'value2' => $parts[5] ?? null,
+                            ],
+                        ]);
+                    }
+                    continue; // Done with this line
+                }
+
+                // USER Parsing
+                if ($table == 'OPERLOG' && str_starts_with($line, 'USER ')) {
+                    $line = substr($line, 5);
+                }
+                if ($table == 'OPERLOG' && !str_contains($line, 'PIN=') && !str_contains($line, 'Name=')) {
+                    continue;
+                }
+
+                $parts = explode("\t", trim($line));
+                $userData = [];
+                foreach ($parts as $part) {
+                    if (str_contains($part, '=')) {
+                        [$k, $v] = explode('=', $part, 2);
+                        $userData[$k] = $v;
+                    }
+                }
+
+                if (empty($userData)) {
+                    $parts = preg_split('/\s+/', trim($line));
+                }
+
+                $pin = $userData['PIN'] ?? $userData['Pin'] ?? null;
+                $name = $userData['Name'] ?? null;
+                $privilege = $userData['Pri'] ?? $userData['Privilege'] ?? 0;
+
+                if ($pin) {
+                    $employee = Employee::where('nik', $pin)->first();
+                    if ($employee) {
+                        $updates = [];
+                        if ($name)
+                            $updates['first_name'] = $name;
+                        if (isset($userData['Pri']) || isset($userData['Privilege'])) {
+                            $updates['device_privilege'] = $privilege;
+                        }
+                        if (!empty($updates)) {
+                            $employee->update($updates);
+                            Log::info("Updated Employee $pin: " . json_encode($updates));
+                        }
+                    } else {
+                        Employee::create([
+                            'nik' => $pin,
+                            'first_name' => $name ?? 'Device User ' . $pin,
+                            'last_name' => '',
+                            'date_of_birth' => '1990-01-01',
+                            'gender' => 'male',
+                            'hire_date' => now(),
+                            'position_id' => $defaultPosition?->id ?? 1,
+                            'device_privilege' => $privilege,
+                        ]);
+                        Log::info("Created Employee for PIN $pin Name " . ($name ?? 'Unknown') . " Pri: $privilege");
+                    }
+                    $count++;
                 }
             }
             return "OK:$count";
@@ -157,10 +490,18 @@ class AdmsController extends Controller
             return "Error";
 
         $device = Device::where('sn', $sn)->first();
-        if (!$device)
-            return "OK";
-
-        $device->update(['last_activity' => now()]);
+        if (!$device) {
+            // Auto register if not found
+            $device = Device::create([
+                'sn' => $sn,
+                'alias' => 'Auto-Detected ' . $sn,
+                'ip_address' => $request->ip(),
+                'last_activity' => now(),
+                'state' => 1,
+            ]);
+        } else {
+            $device->update(['last_activity' => now(), 'ip_address' => $request->ip()]);
+        }
 
         // Fetch pending commands
         // We look for commands where trans_time is NULL (not yet sent/processed)

@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <databaseconnect>
+        <driverclass>com.mysql.jdbc.Driver</driverclass>
+		<url>jdbc:mysql://localhost:3306/pushdemo</url>
+        <user>root</user>
+        <password>root</password>
+    </databaseconnect>
+    <option>
+    	<pagesize>10</pagesize>
+    	<monitorsize>10</monitorsize>
+    	<ver>2</ver>
+    </option>
+</root>

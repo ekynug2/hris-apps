@@ -62,12 +62,31 @@ class EmployeesTable
             ->filters([
                 //
             ])
-            ->recordActions([
-                EditAction::make(),
+            ->actions([
+                \Filament\Actions\EditAction::make(),
             ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+            ->bulkActions([
+                \Filament\Actions\BulkActionGroup::make([
+                    \Filament\Actions\DeleteBulkAction::make(),
+                    \Filament\Actions\BulkAction::make('update_employment_status')
+                        ->label('Update Status')
+                        ->icon('heroicon-o-pencil-square')
+                        ->form([
+                            \Filament\Forms\Components\Select::make('employment_status')
+                                ->label('Employment Status')
+                                ->options([
+                                    'active' => 'Active',
+                                    'contract' => 'Contract',
+                                    'probation' => 'Probation',
+                                    'terminated' => 'Terminated',
+                                    'resigned' => 'Resigned',
+                                ])
+                                ->required(),
+                        ])
+                        ->action(function (\Illuminate\Database\Eloquent\Collection $records, array $data) {
+                            $records->each(fn($record) => $record->update(['employment_status' => $data['employment_status']]));
+                        })
+                        ->deselectRecordsAfterCompletion(),
                 ]),
             ]);
     }
