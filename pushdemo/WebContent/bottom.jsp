@@ -1,1 +1,0 @@
-<div class="push_bottom"><s:text name="push.web.demo.copyright"/></div>
