@@ -24,3 +24,4 @@ yarn-error.log
 docker-compose.yml
 
 /pushdemo/
+/.agent/
