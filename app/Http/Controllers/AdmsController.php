@@ -93,11 +93,31 @@ class AdmsController extends Controller
             // If it's an INFO table push
             if ($table == 'INFO') {
                 $body = $request->getContent();
-                // INFO data often key=value pairs
-                // Count=...
-                // Implement parsing similar to registry if body has content
+                Log::info("ADMS Parsing INFO Table: " . $body);
 
-                // Or sometimes passed as query params?
+                // Content is typically Key=Value pairs, separated by tabs or newlines
+                // Example: UserCount=10\tFPCount=20\t...
+
+                // We use preg_split to handle both tabs and potential newlines or spaces
+                $pairs = preg_split('/[\t\n]/', $body);
+
+                foreach ($pairs as $pair) {
+                    if (str_contains($pair, '=')) {
+                        [$key, $value] = explode('=', trim($pair), 2);
+
+                        if ($key == 'UserCount')
+                            $updateData['user_count'] = $value;
+                        if ($key == 'FPCount')
+                            $updateData['fp_count'] = $value;
+                        if ($key == 'FaceCount')
+                            $updateData['face_count'] = $value;
+                        if ($key == 'TransactionCount')
+                            $updateData['transaction_count'] = $value;
+                        if ($key == 'FWVersion')
+                            $updateData['fw_ver'] = $value;
+                        // Add more mappings if needed
+                    }
+                }
             }
 
             $device->update($updateData);
