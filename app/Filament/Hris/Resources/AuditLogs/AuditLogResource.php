@@ -42,8 +42,6 @@ class AuditLogResource extends Resource
     {
         return [
             'index' => ListAuditLogs::route('/'),
-            'create' => CreateAuditLog::route('/create'),
-            'edit' => EditAuditLog::route('/{record}/edit'),
         ];
     }
 }

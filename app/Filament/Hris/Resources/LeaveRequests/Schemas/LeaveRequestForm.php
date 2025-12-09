@@ -3,9 +3,11 @@
 namespace App\Filament\Hris\Resources\LeaveRequests\Schemas;
 
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Get;
 use Filament\Schemas\Schema;
 
 class LeaveRequestForm
@@ -23,12 +25,12 @@ class LeaveRequestForm
                     ->numeric(),
                 Select::make('status')
                     ->options([
-            'draft' => 'Draft',
-            'pending' => 'Pending',
-            'approved' => 'Approved',
-            'rejected' => 'Rejected',
-            'cancelled' => 'Cancelled',
-        ])
+                        'draft' => 'Draft',
+                        'pending' => 'Pending',
+                        'approved' => 'Approved',
+                        'rejected' => 'Rejected',
+                        'cancelled' => 'Cancelled',
+                    ])
                     ->default('draft')
                     ->required(),
                 Textarea::make('reason')
@@ -40,9 +42,22 @@ class LeaveRequestForm
                 TextInput::make('employee_id')
                     ->required()
                     ->numeric(),
-                TextInput::make('leave_type_id')
+                Select::make('leave_type_id')
+                    ->relationship('leaveType', 'name')
                     ->required()
-                    ->numeric(),
+                    ->live(),
+                FileUpload::make('attachment')
+                    ->disk('public')
+                    ->directory('leave_attachments')
+                    ->visible(function ($get) {
+                        $leaveTypeId = $get('leave_type_id');
+                        if (!$leaveTypeId) {
+                            return false;
+                        }
+                        $leaveType = \App\Models\LeaveType::find($leaveTypeId);
+
+                        return $leaveType ? $leaveType->requires_document : false;
+                    }),
                 TextInput::make('approved_by')
                     ->numeric()
                     ->default(null),

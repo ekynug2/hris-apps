@@ -28,11 +28,13 @@ class UsersTable
                 TextColumn::make('last_login')
                     ->dateTime()
                     ->sortable(),
-                TextColumn::make('employee_id')
-                    ->numeric()
+                TextColumn::make('employee.nik')
+                    ->label('Employee ID (NIK)')
+                    ->searchable()
                     ->sortable(),
-                TextColumn::make('role_id')
-                    ->numeric()
+                TextColumn::make('role.name')
+                    ->label('Role')
+                    ->searchable()
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()

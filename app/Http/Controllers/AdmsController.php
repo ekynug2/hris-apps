@@ -188,9 +188,23 @@ class AdmsController extends Controller
                     if (isset($data[2]) && preg_match('/\d{2}:\d{2}:\d{2}/', $data[2])) {
                         $time .= ' ' . $data[2];
                         $status = $data[3] ?? 0;
+                        $verifyCode = $data[4] ?? 1; // Default to 1 (Finger) if missing
                     } else {
                         $status = $data[2] ?? 0;
+                        $verifyCode = $data[3] ?? 1;
                     }
+
+                    $verifyMethod = match ((int) $verifyCode) {
+                        0 => 'Password',
+                        1 => 'Fingerprint',
+                        2 => 'Card',
+                        3 => 'Password', // Sometimes used
+                        4 => 'Card',     // Sometimes used
+                        15 => 'Face',
+                        20 => 'Face',    // Visible Light Face
+                        25 => 'Palm',
+                        default => 'Fingerprint', // Default assumption
+                    };
 
                     // Log::info("Processing PIN: $pin, Time: $time");
 
@@ -231,17 +245,30 @@ class AdmsController extends Controller
                             );
 
                             if (in_array($status, ['0', '4', '5'])) {
-                                if (!$att->clock_in)
+                                if (!$att->clock_in) {
                                     $att->clock_in = Carbon::parse($time)->toTimeString();
+                                    $att->clock_in_method = $verifyMethod;
+                                }
                             } else {
-                                if (!$att->clock_out)
+                                if (!$att->clock_out) {
                                     $att->clock_out = Carbon::parse($time)->toTimeString();
+                                    $att->clock_out_method = $verifyMethod;
+                                } else {
+                                    // If already has clock_out, maybe overwrite if this is later? 
+                                    // For now, simple logic: first one stays or update on match?
+                                    // Usually we want the Latest clock out.
+                                    if (Carbon::parse($time)->toTimeString() > $att->clock_out) {
+                                        $att->clock_out = Carbon::parse($time)->toTimeString();
+                                        $att->clock_out_method = $verifyMethod;
+                                    }
+                                }
                             }
                             $att->save();
                             //$count++; // Don't just count new ones
                         } else {
                             // Log::info("Attendance duplicate skipped.");
                         }
+
                         $count++; // Count all valid processed lines to Ack the device
                     } else {
                         // Log::warning("Employee NOT found for PIN: $pin. Creating valid attendance requires employee.");
@@ -466,11 +493,17 @@ class AdmsController extends Controller
                         $operator = $parts[1];
                         $time = $parts[2] . ' ' . $parts[3];
 
+                        $operatorName = 'Unknown';
+                        $emp = Employee::where('nik', $operator)->first();
+                        if ($emp) {
+                            $operatorName = $emp->first_name . ' ' . $emp->last_name;
+                        }
+
                         \App\Models\AuditLog::create([
                             'event_time' => $time,
                             'event_type' => $opType,
                             'module' => 'DEVICE_OPLOG',
-                            'description' => "Operation $opType by Operator $operator",
+                            'description' => "Operation $opType by Operator $operator ($operatorName)",
                             'ip_address' => $request->ip(),
                             'user_agent' => 'Device ' . $sn,
                             'is_from_device' => true,

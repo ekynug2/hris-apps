@@ -24,4 +24,9 @@ class AuditLog extends Model
         'event_time' => 'datetime',
         'is_from_device' => 'boolean',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

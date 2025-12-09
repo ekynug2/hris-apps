@@ -2,7 +2,7 @@
 
 namespace App\Filament\Hris\Resources\Users\Schemas;
 
-use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
@@ -19,19 +19,17 @@ class UserForm
                     ->label('Email address')
                     ->email()
                     ->required(),
-                DateTimePicker::make('email_verified_at'),
                 TextInput::make('password')
                     ->password()
                     ->required(),
                 Toggle::make('is_active')
                     ->required(),
-                DateTimePicker::make('last_login'),
-                TextInput::make('employee_id')
-                    ->numeric()
-                    ->default(null),
-                TextInput::make('role_id')
-                    ->numeric()
-                    ->default(null),
+                Select::make('employee_id')
+                    ->relationship('employee', 'first_name')
+                    ->required(),
+                Select::make('role_id')
+                    ->relationship('role', 'name')
+                    ->required(),
             ]);
     }
 }

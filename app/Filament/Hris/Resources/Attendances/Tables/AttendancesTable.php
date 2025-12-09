@@ -29,12 +29,32 @@ class AttendancesTable
                     ->sortable(),
                 TextColumn::make('clock_in')
                     ->time()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->sortable(),
+                TextColumn::make('clock_in_method')
+                    ->label('In Method')
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'Fingerprint' => 'success',
+                        'Face' => 'info',
+                        'Card' => 'warning',
+                        'Password' => 'danger',
+                        default => 'gray',
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('clock_out')
                     ->time()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->sortable(),
+                TextColumn::make('clock_out_method')
+                    ->label('Out Method')
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'Fingerprint' => 'success',
+                        'Face' => 'info',
+                        'Card' => 'warning',
+                        'Password' => 'danger',
+                        default => 'gray',
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('status')
                     ->badge(),
                 //TextColumn::make('lat')
@@ -73,27 +93,31 @@ class AttendancesTable
                     ->exports([
                         \pxlrbt\FilamentExcel\Exports\ExcelExport::make()
                             ->fromTable()
-                            ->withFilename('attendances -' . date('Y-m-d H:i:s'))
+                            ->withFilename('attendances-' . date('Y-m-d-H-i-s'))
                             ->withColumns([
                                 \pxlrbt\FilamentExcel\Columns\Column::make('employee.nik')->heading('NIK'),
                                 \pxlrbt\FilamentExcel\Columns\Column::make('employee.first_name')->heading('Name'),
                                 \pxlrbt\FilamentExcel\Columns\Column::make('date')->heading('Date'),
                                 \pxlrbt\FilamentExcel\Columns\Column::make('clock_in')->heading('Clock In'),
+                                \pxlrbt\FilamentExcel\Columns\Column::make('clock_in_method')->heading('In Method'),
                                 \pxlrbt\FilamentExcel\Columns\Column::make('clock_out')->heading('Clock Out'),
+                                \pxlrbt\FilamentExcel\Columns\Column::make('clock_out_method')->heading('Out Method'),
                                 \pxlrbt\FilamentExcel\Columns\Column::make('status')->heading('Status'),
-                            ])
-                            ->modifyQueryUsing(function ($query) {
-                                // Check if specific filters are applied
-                                $filters = request('tableFilters', []);
-                                $dateFrom = $filters['date_range']['date_from'] ?? null;
-                                $dateTo = $filters['date_range']['date_to'] ?? null;
-                                $search = request('tableSearch');
+                            ]),
+                        /*
+                        ->modifyQueryUsing(function ($query) {
+                            // Check if specific filters are applied
+                            $filters = request('tableFilters', []);
+                            $dateFrom = $filters['date_range']['date_from'] ?? null;
+                            $dateTo = $filters['date_range']['date_to'] ?? null;
+                            $search = request('tableSearch');
 
-                                // If NO filter and NO search, limit export to first page (e.g. 50 items)
-                                if (empty($dateFrom) && empty($dateTo) && empty($search)) {
-                                    $query->limit(50);
-                                }
-                            }),
+                            // If NO filter and NO search, limit export to first page (e.g. 50 items)
+                            if (empty($dateFrom) && empty($dateTo) && empty($search)) {
+                                $query->limit(50); 
+                            }
+                        }),
+                         */
                     ]),
             ])
             ->actions([

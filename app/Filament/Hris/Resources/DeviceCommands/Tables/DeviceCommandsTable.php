@@ -16,6 +16,9 @@ class DeviceCommandsTable
             ->columns([
                 TextColumn::make('device_sn')
                     ->searchable(),
+                TextColumn::make('content')
+                    ->label('Command')
+                    ->searchable(),
                 TextColumn::make('commit_time')
                     ->dateTime()
                     ->sortable(),
@@ -23,7 +26,7 @@ class DeviceCommandsTable
                     ->dateTime()
                     ->sortable(),
                 TextColumn::make('return_value')
-                    ->searchable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

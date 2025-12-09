@@ -27,6 +27,7 @@ class AuditLogForm
                 TextInput::make('user_agent')
                     ->default(null),
                 TextInput::make('user_id')
+                    ->label('Update by')
                     ->numeric()
                     ->default(null),
                 Textarea::make('properties')

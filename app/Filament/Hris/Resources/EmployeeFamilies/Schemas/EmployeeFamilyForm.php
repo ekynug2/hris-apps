@@ -4,7 +4,6 @@ namespace App\Filament\Hris\Resources\EmployeeFamilies\Schemas;
 
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
 class EmployeeFamilyForm
@@ -13,16 +12,17 @@ class EmployeeFamilyForm
     {
         return $schema
             ->components([
-                TextInput::make('name')
+                Select::make('name')
+                    ->relationship('employee', 'first_name')
                     ->required(),
                 Select::make('relation')
                     ->options(['spouse' => 'Spouse', 'child' => 'Child', 'parent' => 'Parent'])
                     ->required(),
                 DatePicker::make('date_of_birth')
                     ->required(),
-                TextInput::make('employee_id')
-                    ->required()
-                    ->numeric(),
+                Select::make('employee_id')
+                    ->relationship('employee', 'first_name')
+                    ->required(),
             ]);
     }
 }

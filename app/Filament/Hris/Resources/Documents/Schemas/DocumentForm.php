@@ -2,8 +2,9 @@
 
 namespace App\Filament\Hris\Resources\Documents\Schemas;
 
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Select;
 use Filament\Schemas\Schema;
 
 class DocumentForm
@@ -12,18 +13,27 @@ class DocumentForm
     {
         return $schema
             ->components([
-                TextInput::make('type')
+                Select::make('type')
+                    ->options([
+                        'Identity Card' => 'Identity Card',
+                        'Family Card' => 'Family Card',
+                        'Education Certificate' => 'Education Certificate',
+                        'Contract' => 'Contract',
+                        'Resume' => 'Resume',
+                        'Other' => 'Other',
+                    ])
                     ->required(),
-                TextInput::make('file_path')
-                    ->required(),
-                DateTimePicker::make('uploaded_at')
-                    ->required(),
-                TextInput::make('employee_id')
+                FileUpload::make('file_path')
                     ->required()
-                    ->numeric(),
-                TextInput::make('uploaded_by')
-                    ->required()
-                    ->numeric(),
+                    ->disk('public')
+                    ->directory('documents'),
+                Select::make('employee_id')
+                    ->relationship('employee', 'first_name')
+                    ->required(),
+                Hidden::make('uploaded_at')
+                    ->default(now()),
+                Hidden::make('uploaded_by')
+                    ->default(fn() => auth()->id()),
             ]);
     }
 }

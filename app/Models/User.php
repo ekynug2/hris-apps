@@ -28,6 +28,10 @@ class User extends Authenticatable implements FilamentUser
         'name',
         'email',
         'password',
+        'last_login',
+        'is_active',
+        'employee_id',
+        'role_id',
     ];
 
     /**
@@ -50,6 +54,25 @@ class User extends Authenticatable implements FilamentUser
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'last_login' => 'datetime',
+            'is_active' => 'boolean',
         ];
+    }
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class);
+    }
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    public function hasPermission(string $permission): bool
+    {
+        if ($this->role && !$this->role->relationLoaded('permissions')) {
+            $this->role->load('permissions');
+        }
+
+        return $this->role?->permissions->contains('name', $permission) ?? false;
     }
 }

@@ -16,6 +16,8 @@ class Attendance extends Model
         'employee_id',
         'lat',
         'lng',
+        'clock_in_method',
+        'clock_out_method',
     ];
     public function employee()
     {

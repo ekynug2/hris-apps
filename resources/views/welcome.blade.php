@@ -157,8 +157,8 @@
                             </svg>
                         </div>
                         <h3 class="font-bold text-white text-xl mb-2">Centralized Data</h3>
-                        <p class="text-slate-400 leading-relaxed">Secure, comprehensive employee records accessible from
-                            anywhere.</p>
+                        <p class="text-slate-400 text-white leading-relaxed">Secure, comprehensive employee records
+                            accessible from anywhere.</p>
                     </div>
                     <div class="glass-card p-8 rounded-2xl group">
                         <div
@@ -169,8 +169,8 @@
                             </svg>
                         </div>
                         <h3 class="font-bold text-white text-xl mb-2">ADMS Push Sync</h3>
-                        <p class="text-slate-400 leading-relaxed">Real-time attendance synchronization with ZKTeco
-                            bio-metric devices.</p>
+                        <p class="text-slate-400 text-white leading-relaxed">Real-time attendance synchronization with
+                            ZKTeco bio-metric devices.</p>
                     </div>
                     <div class="glass-card p-8 rounded-2xl group">
                         <div
@@ -181,17 +181,16 @@
                             </svg>
                         </div>
                         <h3 class="font-bold text-white text-xl mb-2">AI Insights</h3>
-                        <p class="text-slate-400 leading-relaxed">Smart algorithms to detect burnout risks and
-                            attendance anomalies.</p>
+                        <p class="text-slate-400 text-white leading-relaxed">Smart algorithms to detect burnout risks
+                            and attendance anomalies.</p>
                     </div>
                 </div>
             </div>
         </main>
 
         <!-- Footer -->
-        <footer class="w-full py-8 text-center text-slate-600 text-sm reveal-text delay-400">
-            &copy; {{ date('Y') }} HRIS Apps by kykytnh. Built with Laravel
-            v{{ Illuminate\Foundation\Application::VERSION }}
+        <footer class="w-full py-8 text-center text-slate-600 text-sm text-white reveal-text delay-400">
+            &copy; {{ date('Y') }} HRIS Apps by kykytnh
         </footer>
     </div>
 

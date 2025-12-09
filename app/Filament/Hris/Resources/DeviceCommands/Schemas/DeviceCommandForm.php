@@ -16,6 +16,7 @@ class DeviceCommandForm
                 TextInput::make('device_sn')
                     ->required(),
                 Textarea::make('content')
+                    ->label('Command')
                     ->required()
                     ->columnSpanFull(),
                 DateTimePicker::make('commit_time')

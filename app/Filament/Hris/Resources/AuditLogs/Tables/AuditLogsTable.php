@@ -25,8 +25,9 @@ class AuditLogsTable
                     ->searchable(),
                 TextColumn::make('user_agent')
                     ->searchable(),
-                TextColumn::make('user_id')
-                    ->numeric()
+                TextColumn::make('user.name')
+                    ->label('Update by')
+                    ->searchable()
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
@@ -41,12 +42,10 @@ class AuditLogsTable
                 //
             ])
             ->recordActions([
-                EditAction::make(),
+                \Filament\Actions\ViewAction::make(),
             ])
             ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
+                //
             ]);
     }
 }
