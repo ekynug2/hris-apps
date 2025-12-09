@@ -10,6 +10,8 @@ class ListLeaveRequests extends ListRecords
 {
     protected static string $resource = LeaveRequestResource::class;
 
+    protected $queryString = [];
+
     protected function getHeaderActions(): array
     {
         return [

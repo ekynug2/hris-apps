@@ -9,6 +9,8 @@ class ListAuditLogs extends ListRecords
 {
     protected static string $resource = AuditLogResource::class;
 
+    protected $queryString = [];
+
     protected function getHeaderActions(): array
     {
         return [

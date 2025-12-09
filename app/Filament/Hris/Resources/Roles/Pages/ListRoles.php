@@ -10,6 +10,8 @@ class ListRoles extends ListRecords
 {
     protected static string $resource = RoleResource::class;
 
+    protected $queryString = [];
+
     protected function getHeaderActions(): array
     {
         return [

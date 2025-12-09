@@ -9,6 +9,8 @@ class ListDeviceCommands extends ListRecords
 {
     protected static string $resource = DeviceCommandResource::class;
 
+    protected $queryString = [];
+
     protected function getHeaderActions(): array
     {
         return [

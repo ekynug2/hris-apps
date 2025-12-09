@@ -10,6 +10,8 @@ class ListLeaveTypes extends ListRecords
 {
     protected static string $resource = LeaveTypeResource::class;
 
+    protected $queryString = [];
+
     protected function getHeaderActions(): array
     {
         return [

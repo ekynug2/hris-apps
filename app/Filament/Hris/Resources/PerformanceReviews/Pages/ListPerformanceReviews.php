@@ -10,6 +10,8 @@ class ListPerformanceReviews extends ListRecords
 {
     protected static string $resource = PerformanceReviewResource::class;
 
+    protected $queryString = [];
+
     protected function getHeaderActions(): array
     {
         return [

@@ -88,6 +88,7 @@ class AttendancesTable
                             );
                     })
             ])
+            ->persistFiltersInSession()
             ->headerActions([
                 \pxlrbt\FilamentExcel\Actions\Tables\ExportAction::make()
                     ->exports([

@@ -10,6 +10,8 @@ class ListPayrolls extends ListRecords
 {
     protected static string $resource = PayrollResource::class;
 
+    protected $queryString = [];
+
     protected function getHeaderActions(): array
     {
         return [

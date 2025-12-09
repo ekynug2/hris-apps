@@ -10,12 +10,15 @@ class ListEmployees extends ListRecords
 {
     protected static string $resource = EmployeeResource::class;
 
+    protected $queryString = [];
+
     protected function getHeaderActions(): array
     {
         return [
             CreateAction::make(),
         ];
     }
+
     public function getMaxContentWidth(): ?string
     {
         return 'full';

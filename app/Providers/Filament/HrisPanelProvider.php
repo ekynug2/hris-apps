@@ -35,6 +35,10 @@ class HrisPanelProvider extends PanelProvider
             ->font('Poppins')
             ->sidebarCollapsibleOnDesktop()
             ->maxContentWidth('full')
+            ->renderHook(
+                'panels::body.end',
+                fn() => '<script src="/js/clean-url.js"></script>',
+            )
             ->discoverResources(in: app_path('Filament/Hris/Resources'), for: Resources::class)
             ->discoverPages(in: app_path('Filament/Hris/Pages'), for: Pages::class)
             ->pages([

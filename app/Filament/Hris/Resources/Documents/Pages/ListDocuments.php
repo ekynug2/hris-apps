@@ -10,6 +10,8 @@ class ListDocuments extends ListRecords
 {
     protected static string $resource = DocumentResource::class;
 
+    protected $queryString = [];
+
     protected function getHeaderActions(): array
     {
         return [

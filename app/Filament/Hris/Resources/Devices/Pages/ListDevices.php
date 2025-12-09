@@ -10,6 +10,8 @@ class ListDevices extends ListRecords
 {
     protected static string $resource = DeviceResource::class;
 
+    protected $queryString = [];
+
     protected function getHeaderActions(): array
     {
         return [

@@ -10,6 +10,8 @@ class ListOrganizationUnits extends ListRecords
 {
     protected static string $resource = OrganizationUnitResource::class;
 
+    protected $queryString = [];
+
     protected function getHeaderActions(): array
     {
         return [

@@ -10,6 +10,8 @@ class ListLeaveBalances extends ListRecords
 {
     protected static string $resource = LeaveBalanceResource::class;
 
+    protected $queryString = [];
+
     protected function getHeaderActions(): array
     {
         return [

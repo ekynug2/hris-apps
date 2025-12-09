@@ -10,6 +10,8 @@ class ListEmployeeHistories extends ListRecords
 {
     protected static string $resource = EmployeeHistoryResource::class;
 
+    protected $queryString = [];
+
     protected function getHeaderActions(): array
     {
         return [

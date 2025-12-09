@@ -10,6 +10,8 @@ class ListTrainingPrograms extends ListRecords
 {
     protected static string $resource = TrainingProgramResource::class;
 
+    protected $queryString = [];
+
     protected function getHeaderActions(): array
     {
         return [
