@@ -2,11 +2,10 @@
 
 namespace App\Filament\Hris\Resources\DeviceCommands\Tables;
 
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
+
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Actions\ViewAction;
 
 class DeviceCommandsTable
 {
@@ -40,12 +39,10 @@ class DeviceCommandsTable
                 //
             ])
             ->recordActions([
-                EditAction::make(),
+                ViewAction::make(),
             ])
             ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
+                //
             ]);
     }
 }

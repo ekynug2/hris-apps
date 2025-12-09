@@ -27,8 +27,25 @@ class Device extends Model
         'cmd_count',
     ];
 
+    public const STATUS_ONLINE = 'online';
+    public const STATUS_OFFLINE = 'offline';
+    public const STATUS_UNAUTHORIZED = 'unauthorized';
+
     public function department()
     {
         return $this->belongsTo(Department::class);
+    }
+
+    public function getComputedStatusAttribute(): string
+    {
+        if (is_null($this->department_id)) {
+            return self::STATUS_UNAUTHORIZED;
+        }
+
+        if ($this->last_activity >= now()->subMinutes(10)) {
+            return self::STATUS_ONLINE;
+        }
+
+        return self::STATUS_OFFLINE;
     }
 }

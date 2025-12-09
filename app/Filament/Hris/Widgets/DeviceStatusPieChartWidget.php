@@ -14,11 +14,22 @@ class DeviceStatusPieChartWidget extends ChartWidget
 
     protected function getData(): array
     {
-        // Online if activity within last 10 minutes
-        $online = \App\Models\Device::where('last_activity', '>=', now()->subMinutes(10))->count();
-        $totalDevices = \App\Models\Device::count();
-        $offline = max(0, $totalDevices - $online);
-        $unauthorized = 0; // Placeholder
+        // 1. Unauthorized: Department is NULL
+        $unauthorized = \App\Models\Device::whereNull('department_id')->count();
+
+        // 2. Authorized Devices
+        $authorizedDevices = \App\Models\Device::whereNotNull('department_id');
+
+        // 3. Online: Authorized AND active in last 10 mins
+        $online = (clone $authorizedDevices)
+            ->where('last_activity', '>=', now()->subMinutes(10))
+            ->count();
+
+        // 4. Offline: Authorized BUT inactive
+        $offline = (clone $authorizedDevices)
+            ->where('last_activity', '<', now()->subMinutes(10)) // Explicitly check inactive
+            ->count();
+        // Alternatively: $offline = $authorizedDevices->count() - $online;
 
         return [
             'datasets' => [

@@ -2,11 +2,10 @@
 
 namespace App\Filament\Hris\Resources\AuditLogs\Tables;
 
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
+
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Actions\ViewAction;
 
 class AuditLogsTable
 {
@@ -42,7 +41,7 @@ class AuditLogsTable
                 //
             ])
             ->recordActions([
-                \Filament\Actions\ViewAction::make(),
+                ViewAction::make(),
             ])
             ->toolbarActions([
                 //

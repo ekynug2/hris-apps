@@ -10,14 +10,15 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Widgets\AccountWidget;
-use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use App\Filament\Hris\Resources;
+use App\Filament\Hris\Pages;
+use App\Filament\Hris\Widgets;
 
 class HrisPanelProvider extends PanelProvider
 {
@@ -32,15 +33,16 @@ class HrisPanelProvider extends PanelProvider
                 'primary' => Color::Amber,
             ])
             ->font('Poppins')
-            ->discoverResources(in: app_path('Filament/Hris/Resources'), for: 'App\Filament\Hris\Resources')
-            ->discoverPages(in: app_path('Filament/Hris/Pages'), for: 'App\Filament\Hris\Pages')
+            ->sidebarCollapsibleOnDesktop()
+            ->maxContentWidth('full')
+            ->discoverResources(in: app_path('Filament/Hris/Resources'), for: Resources::class)
+            ->discoverPages(in: app_path('Filament/Hris/Pages'), for: Pages::class)
             ->pages([
                 Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Hris/Widgets'), for: 'App\Filament\Hris\Widgets')
+            ->discoverWidgets(in: app_path('Filament/Hris/Widgets'), for: Widgets::class)
             ->widgets([
-                // AccountWidget::class,
-                // FilamentInfoWidget::class,
+                //
             ])
             ->middleware([
                 EncryptCookies::class,

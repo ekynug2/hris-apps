@@ -2,16 +2,20 @@
 
 namespace App\Filament\Hris\Resources\Devices\Tables;
 
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\EditAction;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
+//use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 use Filament\Notifications\Notification;
+use App\Models\Device;
+use App\Models\DeviceCommand;
+use App\Models\Department;
 
 class DevicesTable
 {
@@ -34,14 +38,15 @@ class DevicesTable
                 TextColumn::make('ip_address')
                     ->label('Device IP')
                     ->searchable(),
-                IconColumn::make('state')
-                    ->label('State')
-                    ->boolean()
-                    ->trueIcon('heroicon-o-check-circle')
-                    ->falseIcon('heroicon-o-minus-circle')
-                    ->trueColor('success')
-                    ->falseColor('danger')
-                    ->default(false),
+                TextColumn::make('computed_status')
+                    ->label('Status')
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        Device::STATUS_ONLINE => 'success',
+                        Device::STATUS_OFFLINE => 'danger',
+                        Device::STATUS_UNAUTHORIZED => 'warning',
+                    })
+                    ->formatStateUsing(fn(string $state): string => ucfirst($state)),
                 TextColumn::make('last_activity')
                     ->label('Last Activity')
                     ->dateTime()
@@ -63,30 +68,30 @@ class DevicesTable
                     ->sortable(),
                 TextColumn::make('cmd_count')
                     ->label('Cmd')
-                    ->state(fn($record) => \App\Models\DeviceCommand::where('device_sn', $record->sn)->whereNull('trans_time')->count())
+                    ->state(fn($record) => DeviceCommand::where('device_sn', $record->sn)->whereNull('trans_time')->count())
                     ->sortable(),
             ])
             ->filters([
                 //
             ])
             ->actions([
-                \Filament\Actions\EditAction::make(),
-                \Filament\Actions\DeleteAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                \Filament\Actions\BulkActionGroup::make([
-                    \Filament\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
 
                 // Data Transfer Group
-                \Filament\Actions\BulkActionGroup::make([
-                    \Filament\Actions\BulkAction::make('transfer_area')
+                BulkActionGroup::make([
+                    BulkAction::make('transfer_area')
                         ->label('Transfer Area')
                         ->icon('heroicon-o-building-office-2')
                         ->form([
-                            \Filament\Forms\Components\Select::make('department_id')
+                            Select::make('department_id')
                                 ->label('Select New Area')
-                                ->options(\App\Models\Department::pluck('name', 'id'))
+                                ->options(Department::pluck('name', 'id'))
                                 ->required(),
                         ])
                         ->action(function (Collection $records, array $data) {
@@ -101,16 +106,16 @@ class DevicesTable
                         })
                         ->deselectRecordsAfterCompletion(),
 
-                    \Filament\Actions\BulkAction::make('upload_user_data')
+                    BulkAction::make('upload_user_data')
                         ->label('Upload User Data')
                         ->action(fn(Collection $records) => self::sendCommand('DATA QUERY USERINFO', $records)),
-                    \Filament\Actions\BulkAction::make('upload_fingerprint')
+                    BulkAction::make('upload_fingerprint')
                         ->label('Upload Fingerprint')
                         ->action(fn(Collection $records) => self::sendCommand('DATA QUERY FP', $records)),
-                    \Filament\Actions\BulkAction::make('upload_face')
+                    BulkAction::make('upload_face')
                         ->label('Upload Face')
                         ->action(fn(Collection $records) => self::sendCommand('DATA QUERY FACE', $records)),
-                    \Filament\Actions\BulkAction::make('upload_transaction')
+                    BulkAction::make('upload_transaction')
                         ->label('Upload Transaction')
                         ->action(fn(Collection $records) => self::sendCommand('DATA QUERY ATTLOG', $records)),
                 ])
@@ -118,16 +123,16 @@ class DevicesTable
                     ->icon('heroicon-o-arrow-path-rounded-square'),
 
                 // Data Clean Group
-                \Filament\Actions\BulkActionGroup::make([
-                    \Filament\Actions\BulkAction::make('clear_attendance')
+                BulkActionGroup::make([
+                    BulkAction::make('clear_attendance')
                         ->label('Clear Attendance Data')
                         ->requiresConfirmation()
                         ->action(fn(Collection $records) => self::sendCommand('CLEAR DATA ATTLOG', $records)),
-                    \Filament\Actions\BulkAction::make('clear_image')
+                    BulkAction::make('clear_image')
                         ->label('Clear the captured image')
                         ->requiresConfirmation()
                         ->action(fn(Collection $records) => self::sendCommand('CLEAR DATA LOG', $records)), // Verify command later
-                    \Filament\Actions\BulkAction::make('clear_all')
+                    BulkAction::make('clear_all')
                         ->label('Clear All Data')
                         ->requiresConfirmation()
                         ->color('danger')
@@ -137,31 +142,31 @@ class DevicesTable
                     ->icon('heroicon-o-trash'),
 
                 // Device Menu Group
-                \Filament\Actions\BulkActionGroup::make([
-                    \Filament\Actions\BulkAction::make('reboot')
+                BulkActionGroup::make([
+                    BulkAction::make('reboot')
                         ->label('Reboot')
                         ->requiresConfirmation()
                         ->action(fn(Collection $records) => self::sendCommand('REBOOT', $records)),
-                    \Filament\Actions\BulkAction::make('read_info')
+                    BulkAction::make('read_info')
                         ->label('Read Information')
                         ->action(fn(Collection $records) => self::sendCommand('INFO', $records)),
-                    \Filament\Actions\BulkAction::make('enroll_remote')
+                    BulkAction::make('enroll_remote')
                         ->label('Enroll Remotely') // Requires args usually
                         ->action(fn(Collection $records) => self::sendCommand('ENROLL_FP', $records)),
-                    \Filament\Actions\BulkAction::make('duplicate_punch')
+                    BulkAction::make('duplicate_punch')
                         ->label('Duplicate Punch Period') // Complex
                         ->action(fn(Collection $records) => self::sendCommand('INFO', $records)),
-                    \Filament\Actions\BulkAction::make('capture_setting')
+                    BulkAction::make('capture_setting')
                         ->label('Capture Setting')
                         ->action(fn(Collection $records) => self::sendCommand('INFO', $records)),
-                    \Filament\Actions\BulkAction::make('upgrade_fw')
+                    BulkAction::make('upgrade_fw')
                         ->label('Upgrade Firmware')
                         ->requiresConfirmation()
                         ->action(fn(Collection $records) => self::sendCommand('INFO', $records)), // Placeholder
-                    \Filament\Actions\BulkAction::make('dst')
+                    BulkAction::make('dst')
                         ->label('Daylight Saving Time')
                         ->action(fn(Collection $records) => self::sendCommand('INFO', $records)),
-                    \Filament\Actions\BulkAction::make('punch_state')
+                    BulkAction::make('punch_state')
                         ->label('Punch State Change Setting')
                         ->action(fn(Collection $records) => self::sendCommand('INFO', $records)),
                 ])
@@ -174,7 +179,7 @@ class DevicesTable
     {
         $count = 0;
         foreach ($records as $device) {
-            \App\Models\DeviceCommand::create([
+            DeviceCommand::create([
                 'device_sn' => $device->sn,
                 'content' => $commandContent,
                 'trans_time' => null, // null means pending

@@ -82,6 +82,19 @@ class AdmsController extends Controller
 
         $device = Device::where('sn', $sn)->first();
         if ($device) {
+            // Check Authorization
+            if (is_null($device->department_id)) {
+                Log::warning("ADMS: Unauthorized Access attempt from SN: $sn (No Department Assigned). Data ignored.");
+                // We still update activity to show it's "alive" (but unauthorized status in widget)
+                $device->update([
+                    'ip_address' => $request->ip(),
+                    'last_activity' => now()
+                ]);
+
+                // Return Error to force device to retry/hold data until authorized.
+                return "Error: Unauthorized";
+            }
+
             // Update stats if provided in query string (often sent with INFO command or heartbeat)
             // But cdata might just have table.
 

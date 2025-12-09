@@ -42,8 +42,6 @@ class DeviceCommandResource extends Resource
     {
         return [
             'index' => ListDeviceCommands::route('/'),
-            'create' => CreateDeviceCommand::route('/create'),
-            'edit' => EditDeviceCommand::route('/{record}/edit'),
         ];
     }
 }

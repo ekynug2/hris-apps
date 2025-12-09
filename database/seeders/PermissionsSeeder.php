@@ -14,9 +14,7 @@ class PermissionsSeeder extends Seeder
     {
         $modules = [
             'attendances',
-            'audit_logs',
             'departments',
-            'device_commands',
             'devices',
             'documents',
             'employee_families',
@@ -40,7 +38,8 @@ class PermissionsSeeder extends Seeder
             'view_any' => 'View (Read)',
             'create' => 'Create (Write)',
             'update' => 'Update (Edit)',
-            'delete' => 'Active',
+            'delete' => 'Delete (Delete)',
+            'soft_delete' => 'Soft Delete (Soft Delete)',
         ];
 
         foreach ($modules as $module) {

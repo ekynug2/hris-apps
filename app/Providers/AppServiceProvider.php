@@ -6,6 +6,28 @@ use App\Listeners\UpdateLastLogin;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use App\Observers\GenericAuditObserver;
+use App\Models\Attendance;
+use App\Models\BioTemplate;
+use App\Models\Department;
+use App\Models\Device;
+use App\Models\DeviceCommand;
+use App\Models\Document;
+use App\Models\Employee;
+use App\Models\EmployeeFamily;
+use App\Models\EmployeeHistory;
+use App\Models\LeaveBalance;
+use App\Models\LeaveRequest;
+use App\Models\LeaveType;
+use App\Models\OrganizationUnit;
+use App\Models\Payroll;
+use App\Models\PerformanceReview;
+use App\Models\Permission;
+use App\Models\Position;
+use App\Models\Role;
+use App\Models\TrainingEnrollment;
+use App\Models\TrainingProgram;
+use App\Models\User;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -29,31 +51,31 @@ class AppServiceProvider extends ServiceProvider
 
         // List of models to observe
         $models = [
-            \App\Models\Attendance::class,
-            \App\Models\BioTemplate::class,
-            \App\Models\Department::class,
-            \App\Models\Device::class,
-            \App\Models\DeviceCommand::class,
-            \App\Models\Document::class,
-            \App\Models\Employee::class,
-            \App\Models\EmployeeFamily::class,
-            \App\Models\EmployeeHistory::class,
-            \App\Models\LeaveBalance::class,
-            \App\Models\LeaveRequest::class,
-            \App\Models\LeaveType::class,
-            \App\Models\OrganizationUnit::class,
-            \App\Models\Payroll::class,
-            \App\Models\PerformanceReview::class,
-            \App\Models\Permission::class,
-            \App\Models\Position::class,
-            \App\Models\Role::class,
-            \App\Models\TrainingEnrollment::class,
-            \App\Models\TrainingProgram::class,
-            \App\Models\User::class,
+            Attendance::class,
+            BioTemplate::class,
+            Department::class,
+            Device::class,
+            DeviceCommand::class,
+            Document::class,
+            Employee::class,
+            EmployeeFamily::class,
+            EmployeeHistory::class,
+            LeaveBalance::class,
+            LeaveRequest::class,
+            LeaveType::class,
+            OrganizationUnit::class,
+            Payroll::class,
+            PerformanceReview::class,
+            Permission::class,
+            Position::class,
+            Role::class,
+            TrainingEnrollment::class,
+            TrainingProgram::class,
+            User::class,
         ];
 
         foreach ($models as $model) {
-            $model::observe(\App\Observers\GenericAuditObserver::class);
+            $model::observe(GenericAuditObserver::class);
         }
     }
 }
