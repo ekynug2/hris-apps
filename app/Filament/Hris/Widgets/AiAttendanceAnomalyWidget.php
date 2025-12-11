@@ -138,8 +138,8 @@ class AiAttendanceAnomalyWidget extends TableWidget
         $totalLates = $lates->count();
         if ($totalLates >= 3) {
             $monFriLates = $lates->filter(function ($r) {
-                $day = Carbon::parse($r->date)->dayOfWeek;
-                return $day === Carbon::MONDAY || $day === Carbon::FRIDAY;
+                $day = (int) Carbon::parse($r->date)->dayOfWeek;
+                return $day === \Carbon\CarbonInterface::MONDAY || $day === \Carbon\CarbonInterface::FRIDAY;
             })->count();
 
             if (($monFriLates / $totalLates) >= 0.6) {

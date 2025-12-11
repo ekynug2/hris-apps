@@ -7,6 +7,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\PayrollItem;
 use App\Models\Employee;
 
+/**
+ * @property \Illuminate\Support\Carbon|null $period_start
+ * @property \Illuminate\Support\Carbon|null $period_end
+ * @property \Illuminate\Support\Carbon|null $pay_date
+ */
 class Payslip extends Model
 {
     protected $fillable = [
@@ -101,7 +106,7 @@ class Payslip extends Model
 
     public function getPeriodLabelAttribute(): string
     {
-        return $this->period_start->format('F Y');
+        return $this->period_start?->format('F Y') ?? '-';
     }
 
     public function createDataSnapshot(PayrollItem $item): void

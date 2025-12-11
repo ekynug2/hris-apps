@@ -11,6 +11,11 @@ use App\Models\User;
 use App\Models\PayrollItem;
 use App\Models\Payslip;
 
+/**
+ * @property \Illuminate\Support\Carbon|null $period_start
+ * @property \Illuminate\Support\Carbon|null $period_end
+ * @property \Illuminate\Support\Carbon|null $pay_date
+ */
 class PayrollRun extends Model
 {
     protected $fillable = [
@@ -69,7 +74,7 @@ class PayrollRun extends Model
         return $this->hasMany(PayrollItem::class);
     }
 
-    public function payslips(): HasMany
+    public function payslips(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
     {
         return $this->hasManyThrough(Payslip::class, PayrollItem::class);
     }
@@ -108,7 +113,7 @@ class PayrollRun extends Model
 
     public function getPeriodLabelAttribute(): string
     {
-        return $this->period_start->format('M Y');
+        return $this->period_start?->format('M Y') ?? '-';
     }
 
     public function recalculateTotals(): void

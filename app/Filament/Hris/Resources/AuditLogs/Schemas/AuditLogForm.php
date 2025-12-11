@@ -2,7 +2,7 @@
 
 namespace App\Filament\Hris\Resources\AuditLogs\Schemas;
 
-use DateTime;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Schema;
@@ -13,7 +13,7 @@ class AuditLogForm
     {
         return $schema
             ->components([
-                DateTime::make('event_time')
+                DateTimePicker::make('event_time')
                     ->label('Waktu Kejadian')
                     ->required(),
                 TextInput::make('event_type')

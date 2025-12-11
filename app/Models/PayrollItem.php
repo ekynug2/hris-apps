@@ -12,6 +12,26 @@ use App\Models\Payslip;
 use App\Models\PayrollAdjustment;
 use App\Models\Attendance;
 
+/**
+ * @property float|string|null $basic_salary
+ * @property float|string|null $allowance_position
+ * @property float|string|null $allowance_transport
+ * @property float|string|null $allowance_meal
+ * @property float|string|null $overtime_pay
+ * @property float|string|null $bonus
+ * @property float|string|null $other_earnings
+ * @property float|string|null $bpjs_kesehatan
+ * @property float|string|null $bpjs_ketenagakerjaan
+ * @property float|string|null $pph21
+ * @property float|string|null $loan_deduction
+ * @property float|string|null $late_penalty
+ * @property float|string|null $absence_deduction
+ * @property float|string|null $other_deductions
+ * @property float|string|null $gross_pay
+ * @property float|string|null $total_deductions
+ * @property float|string|null $net_pay
+ * @property float|string|null $overtime_hours
+ */
 class PayrollItem extends Model
 {
     protected $fillable = [
@@ -115,7 +135,7 @@ class PayrollItem extends Model
             + $this->other_deductions;
 
         // Calculate net pay
-        $this->net_pay = $this->gross_pay - $this->total_deductions;
+        $this->net_pay = (float) $this->gross_pay - (float) $this->total_deductions;
 
         $this->save();
     }
@@ -151,11 +171,11 @@ class PayrollItem extends Model
         $employee = $this->employee;
         $position = $employee->position;
 
-        $this->basic_salary = $position->base_salary ?? 0;
+        $this->basic_salary = (float) ($position->base_salary ?? 0);
         // Allowances can be set from position meta or custom rules
-        $this->allowance_position = 0;
-        $this->allowance_transport = 0;
-        $this->allowance_meal = 0;
+        $this->allowance_position = 0.00;
+        $this->allowance_transport = 0.00;
+        $this->allowance_meal = 0.00;
     }
 
     public function loadFromAttendance(): void
@@ -185,6 +205,6 @@ class PayrollItem extends Model
         $this->working_days = $workingDays;
 
         // Calculate penalties (example: Rp 50.000 per late)
-        $this->late_penalty = $this->late_count * 50000;
+        $this->late_penalty = (float) ($this->late_count * 50000);
     }
 }
