@@ -16,7 +16,9 @@ use Filament\Tables\Table;
 
 class EmployeeHistoryResource extends Resource
 {
-    protected static string|\UnitEnum|null $navigationGroup = "HR Management";
+    protected static string|\UnitEnum|null $navigationGroup = "Manajemen SDM";
+    protected static ?string $modelLabel = 'Riwayat Karyawan';
+    protected static ?string $pluralModelLabel = 'Riwayat Karyawan';
     protected static ?string $model = EmployeeHistory::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clock';

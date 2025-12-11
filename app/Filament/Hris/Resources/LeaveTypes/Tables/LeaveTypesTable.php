@@ -16,18 +16,23 @@ class LeaveTypesTable
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->label('Nama Tipe Cuti')
                     ->searchable(),
                 TextColumn::make('default_days')
+                    ->label('Hari Default')
                     ->numeric()
                     ->sortable(),
                 IconColumn::make('requires_document')
+                    ->label('Wajib Dokumen')
                     ->boolean(),
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Dibuat')
+                    ->dateTime('d M Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Diperbarui')
+                    ->dateTime('d M Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

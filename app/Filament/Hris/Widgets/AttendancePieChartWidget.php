@@ -6,9 +6,9 @@ use Filament\Widgets\ChartWidget;
 
 class AttendancePieChartWidget extends ChartWidget
 {
-    protected static ?int $sort = 1;
+    protected static ?int $sort = 1;  // First row with Attendance Trend
 
-    protected ?string $heading = 'Present';
+    protected ?string $heading = 'Hadir';
 
     protected int|string|array $columnSpan = 1;
 
@@ -21,7 +21,7 @@ class AttendancePieChartWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Attendance',
+                    'label' => 'Kehadiran',
                     'data' => [$present, $absent],
                     'backgroundColor' => [
                         '#4ade80', // Green
@@ -30,7 +30,7 @@ class AttendancePieChartWidget extends ChartWidget
                     'hoverOffset' => 4,
                 ],
             ],
-            'labels' => ['Present', 'Absent'],
+            'labels' => ['Hadir', 'Tidak Hadir'],
         ];
     }
 

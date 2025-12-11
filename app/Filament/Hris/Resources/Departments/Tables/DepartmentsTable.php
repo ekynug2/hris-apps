@@ -15,19 +15,24 @@ class DepartmentsTable
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->label('Nama Departemen')
                     ->searchable(),
                 TextColumn::make('organization_unit_id')
+                    ->label('Unit Organisasi')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('head_id')
+                    ->label('Kepala Departemen')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Dibuat')
+                    ->dateTime('d M Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Diperbarui')
+                    ->dateTime('d M Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

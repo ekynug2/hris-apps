@@ -24,11 +24,11 @@ class DevicesTable
         return $table
             ->columns([
                 TextColumn::make('alias')
-                    ->label('Device Name')
+                    ->label('Nama Perangkat')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('sn')
-                    ->label('Serial Number')
+                    ->label('Nomor Seri')
                     ->searchable()
                     ->copyable(),
                 TextColumn::make('department.name')
@@ -36,7 +36,7 @@ class DevicesTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('ip_address')
-                    ->label('Device IP')
+                    ->label('IP Perangkat')
                     ->searchable(),
                 TextColumn::make('computed_status')
                     ->label('Status')
@@ -48,26 +48,26 @@ class DevicesTable
                     })
                     ->formatStateUsing(fn(string $state): string => ucfirst($state)),
                 TextColumn::make('last_activity')
-                    ->label('Last Activity')
+                    ->label('Aktivitas Terakhir')
                     ->dateTime()
                     ->sortable(),
                 TextColumn::make('user_count')
-                    ->label('User Qty.')
+                    ->label('Jml User')
                     ->sortable(),
                 TextColumn::make('fp_count')
-                    ->label('FP Qty.')
+                    ->label('Jml Sidik Jari')
                     ->sortable(),
                 TextColumn::make('face_count')
-                    ->label('Face Qty.')
+                    ->label('Jml Wajah')
                     ->sortable(),
                 TextColumn::make('palm_count')
-                    ->label('Palm Qty.')
+                    ->label('Jml Telapak')
                     ->sortable(),
                 TextColumn::make('transaction_count')
-                    ->label('Transaction Qty.')
+                    ->label('Jml Transaksi')
                     ->sortable(),
                 TextColumn::make('cmd_count')
-                    ->label('Cmd')
+                    ->label('Perintah')
                     ->state(fn($record) => DeviceCommand::where('device_sn', $record->sn)->whereNull('trans_time')->count())
                     ->sortable(),
             ])
@@ -86,11 +86,11 @@ class DevicesTable
                 // Data Transfer Group
                 BulkActionGroup::make([
                     BulkAction::make('transfer_area')
-                        ->label('Transfer Area')
+                        ->label('Pindah Area')
                         ->icon('heroicon-o-building-office-2')
                         ->form([
                             Select::make('department_id')
-                                ->label('Select New Area')
+                                ->label('Pilih Area Baru')
                                 ->options(Department::pluck('name', 'id'))
                                 ->required(),
                         ])
@@ -99,46 +99,46 @@ class DevicesTable
                             $records->each(fn($record) => $record->update(['department_id' => $data['department_id']]));
 
                             Notification::make()
-                                ->title('Area Transferred')
-                                ->body("{$cnt} devices moved to new area.")
+                                ->title('Area Dipindahkan')
+                                ->body("{$cnt} perangkat dipindahkan ke area baru.")
                                 ->success()
                                 ->send();
                         })
                         ->deselectRecordsAfterCompletion(),
 
                     BulkAction::make('upload_user_data')
-                        ->label('Upload User Data')
+                        ->label('Upload Data User')
                         ->action(fn(Collection $records) => self::sendCommand('DATA QUERY USERINFO', $records)),
                     BulkAction::make('upload_fingerprint')
-                        ->label('Upload Fingerprint')
+                        ->label('Upload Sidik Jari')
                         ->action(fn(Collection $records) => self::sendCommand('DATA QUERY FP', $records)),
                     BulkAction::make('upload_face')
-                        ->label('Upload Face')
+                        ->label('Upload Wajah')
                         ->action(fn(Collection $records) => self::sendCommand('DATA QUERY FACE', $records)),
                     BulkAction::make('upload_transaction')
-                        ->label('Upload Transaction')
+                        ->label('Upload Transaksi')
                         ->action(fn(Collection $records) => self::sendCommand('DATA QUERY ATTLOG', $records)),
                 ])
-                    ->label('Data Transfer')
+                    ->label('Transfer Data')
                     ->icon('heroicon-o-arrow-path-rounded-square'),
 
                 // Data Clean Group
                 BulkActionGroup::make([
                     BulkAction::make('clear_attendance')
-                        ->label('Clear Attendance Data')
+                        ->label('Hapus Data Absensi')
                         ->requiresConfirmation()
                         ->action(fn(Collection $records) => self::sendCommand('CLEAR DATA ATTLOG', $records)),
                     BulkAction::make('clear_image')
-                        ->label('Clear the captured image')
+                        ->label('Hapus Gambar')
                         ->requiresConfirmation()
                         ->action(fn(Collection $records) => self::sendCommand('CLEAR DATA LOG', $records)), // Verify command later
                     BulkAction::make('clear_all')
-                        ->label('Clear All Data')
+                        ->label('Hapus Semua Data')
                         ->requiresConfirmation()
                         ->color('danger')
                         ->action(fn(Collection $records) => self::sendCommand('CLEAR ALL DATA', $records)),
                 ])
-                    ->label('Data Clean')
+                    ->label('Bersihkan Data')
                     ->icon('heroicon-o-trash'),
 
                 // Device Menu Group
@@ -148,16 +148,16 @@ class DevicesTable
                         ->requiresConfirmation()
                         ->action(fn(Collection $records) => self::sendCommand('REBOOT', $records)),
                     BulkAction::make('read_info')
-                        ->label('Read Information')
+                        ->label('Baca Informasi')
                         ->action(fn(Collection $records) => self::sendCommand('INFO', $records)),
                     BulkAction::make('enroll_remote')
-                        ->label('Enroll Remotely') // Requires args usually
+                        ->label('Daftar Jarak Jauh') // Requires args usually
                         ->action(fn(Collection $records) => self::sendCommand('ENROLL_FP', $records)),
                     BulkAction::make('duplicate_punch')
-                        ->label('Duplicate Punch Period') // Complex
+                        ->label('Duplikat Periode Punch') // Complex
                         ->action(fn(Collection $records) => self::sendCommand('INFO', $records)),
                     BulkAction::make('capture_setting')
-                        ->label('Capture Setting')
+                        ->label('Pengaturan Capture')
                         ->action(fn(Collection $records) => self::sendCommand('INFO', $records)),
                     BulkAction::make('upgrade_fw')
                         ->label('Upgrade Firmware')
@@ -167,10 +167,10 @@ class DevicesTable
                         ->label('Daylight Saving Time')
                         ->action(fn(Collection $records) => self::sendCommand('INFO', $records)),
                     BulkAction::make('punch_state')
-                        ->label('Punch State Change Setting')
+                        ->label('Pengaturan Punch State')
                         ->action(fn(Collection $records) => self::sendCommand('INFO', $records)),
                 ])
-                    ->label('Device Menu')
+                    ->label('Menu Perangkat')
                     ->icon('heroicon-o-bars-3'),
             ]);
     }

@@ -14,15 +14,19 @@ class DeviceCommandForm
         return $schema
             ->components([
                 TextInput::make('device_sn')
+                    ->label('Nomor Seri Perangkat')
                     ->required(),
                 Textarea::make('content')
-                    ->label('Command')
+                    ->label('Perintah')
                     ->required()
                     ->columnSpanFull(),
                 DateTimePicker::make('commit_time')
+                    ->label('Waktu Commit')
                     ->required(),
-                DateTimePicker::make('trans_time'),
+                DateTimePicker::make('trans_time')
+                    ->label('Waktu Transaksi'),
                 TextInput::make('return_value')
+                    ->label('Nilai Kembali')
                     ->default(null),
             ]);
     }

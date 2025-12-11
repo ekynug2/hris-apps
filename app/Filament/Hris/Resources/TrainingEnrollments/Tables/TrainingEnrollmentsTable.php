@@ -15,19 +15,24 @@ class TrainingEnrollmentsTable
         return $table
             ->columns([
                 TextColumn::make('status')
+                    ->label('Status')
                     ->badge(),
                 TextColumn::make('employee_id')
+                    ->label('ID Karyawan')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('training_id')
+                    ->label('ID Pelatihan')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Dibuat')
+                    ->dateTime('d M Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Diperbarui')
+                    ->dateTime('d M Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

@@ -3,7 +3,7 @@
 namespace App\Filament\Hris\Resources\Attendances;
 
 use App\Filament\Hris\Resources\Attendances\Pages\CreateAttendance;
-use App\Filament\Hris\Resources\Attendances\Pages\EditAttendance;
+//use App\Filament\Hris\Resources\Attendances\Pages\EditAttendance;
 use App\Filament\Hris\Resources\Attendances\Pages\ListAttendances;
 use App\Filament\Hris\Resources\Attendances\Schemas\AttendanceForm;
 use App\Filament\Hris\Resources\Attendances\Tables\AttendancesTable;
@@ -11,12 +11,14 @@ use App\Models\Attendance;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
+//use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class AttendanceResource extends Resource
 {
-    protected static string|\UnitEnum|null $navigationGroup = "Time & Attendance";
+    protected static string|\UnitEnum|null $navigationGroup = "Absensi & Kehadiran";
+    protected static ?string $modelLabel = 'Absensi';
+    protected static ?string $pluralModelLabel = 'Data Absensi';
     protected static ?string $model = Attendance::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-finger-print';

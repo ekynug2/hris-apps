@@ -16,7 +16,9 @@ use Filament\Tables\Table;
 
 class DeviceCommandResource extends Resource
 {
-    protected static string|\UnitEnum|null $navigationGroup = "System Settings";
+    protected static string|\UnitEnum|null $navigationGroup = "Pengaturan Sistem";
+    protected static ?string $modelLabel = 'Perintah Perangkat';
+    protected static ?string $pluralModelLabel = 'Perintah Perangkat';
     protected static ?string $model = DeviceCommand::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-command-line';

@@ -14,4 +14,9 @@ class Position extends Model
         'department_id',
         'meta',
     ];
+
+    public function department(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Department::class);
+    }
 }

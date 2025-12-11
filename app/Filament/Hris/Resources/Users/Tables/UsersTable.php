@@ -16,32 +16,38 @@ class UsersTable
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->label('Nama')
                     ->searchable(),
                 TextColumn::make('email')
-                    ->label('Email address')
+                    ->label('Email')
                     ->searchable(),
                 TextColumn::make('email_verified_at')
-                    ->dateTime()
+                    ->label('Terverifikasi')
+                    ->dateTime('d M Y H:i')
                     ->sortable(),
                 IconColumn::make('is_active')
+                    ->label('Aktif')
                     ->boolean(),
                 TextColumn::make('last_login')
-                    ->dateTime()
+                    ->label('Login Terakhir')
+                    ->dateTime('d M Y H:i')
                     ->sortable(),
                 TextColumn::make('employee.nik')
-                    ->label('Employee ID (NIK)')
+                    ->label('ID Karyawan (NIK)')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('role.name')
-                    ->label('Role')
+                    ->label('Peran')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Dibuat')
+                    ->dateTime('d M Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Diperbarui')
+                    ->dateTime('d M Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

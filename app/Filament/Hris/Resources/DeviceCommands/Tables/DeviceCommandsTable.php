@@ -14,24 +14,30 @@ class DeviceCommandsTable
         return $table
             ->columns([
                 TextColumn::make('device_sn')
+                    ->label('Nomor Seri')
                     ->searchable(),
                 TextColumn::make('content')
-                    ->label('Command')
+                    ->label('Perintah')
                     ->searchable(),
                 TextColumn::make('commit_time')
-                    ->dateTime()
+                    ->label('Waktu Commit')
+                    ->dateTime('d M Y H:i')
                     ->sortable(),
                 TextColumn::make('trans_time')
-                    ->dateTime()
+                    ->label('Waktu Transaksi')
+                    ->dateTime('d M Y H:i')
                     ->sortable(),
                 TextColumn::make('return_value')
+                    ->label('Nilai Kembali')
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Dibuat')
+                    ->dateTime('d M Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Diperbarui')
+                    ->dateTime('d M Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

@@ -10,13 +10,12 @@ use App\Models\Employee; // Added
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Sushi\Sushi;
 
 class AiAttendanceAnomalyWidget extends TableWidget
 {
     protected static ?int $sort = 3;
     protected int|string|array $columnSpan = 'full';
-    protected static ?string $heading = 'AI Anomaly Detection';
+    protected static ?string $heading = 'Deteksi Anomali AI';
 
 
 
@@ -68,20 +67,19 @@ class AiAttendanceAnomalyWidget extends TableWidget
             ->query(
                 Employee::query()->whereIn('id', $this->anomalousIds)
             )
+            ->searchable(false)
             ->columns([
-                TextColumn::make('fullname')
-                    ->label('Employee')
+                TextColumn::make('first_name')
+                    ->label('Karyawan')
                     ->description(fn(Employee $record) => $record->nik)
-                    ->formatStateUsing(fn(Employee $record) => $record->first_name . ' ' . $record->last_name)
-                    ->searchable(['first_name', 'last_name', 'nik'])
-                    ->sortable(['first_name', 'last_name']),
+                    ->getStateUsing(fn(Employee $record) => $record->first_name . ' ' . $record->last_name),
 
                 TextColumn::make('anomaly_title')
-                    ->label('Issue')
+                    ->label('Masalah')
                     ->state(fn(Employee $record) => $this->analysisCache[$record->id]['title'] ?? 'Unknown'),
 
                 TextColumn::make('anomaly_level')
-                    ->label('Severity')
+                    ->label('Tingkat Keparahan')
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         'critical' => 'danger',
@@ -92,14 +90,17 @@ class AiAttendanceAnomalyWidget extends TableWidget
                     ->state(fn(Employee $record) => $this->analysisCache[$record->id]['level'] ?? 'info'),
 
                 TextColumn::make('description')
-                    ->label('AI Insight')
+                    ->label('Wawasan AI')
                     ->wrap()
                     ->state(fn(Employee $record) => $this->analysisCache[$record->id]['description'] ?? '-'),
 
                 TextColumn::make('metric')
-                    ->label('Data Point')
+                    ->label('Data Terkait')
                     ->state(fn(Employee $record) => $this->analysisCache[$record->id]['metric'] ?? '-'),
             ])
+            ->emptyStateHeading('Tidak Ada Anomali Terdeteksi')
+            ->emptyStateDescription('Semua karyawan menunjukkan pola absensi yang normal. Kerja bagus!')
+            ->emptyStateIcon('heroicon-o-check-circle') // Wait, did I miss checking if emptyStateIcon needs change? No, Icon is fine.
             ->paginated(false);
     }
 
@@ -116,18 +117,18 @@ class AiAttendanceAnomalyWidget extends TableWidget
         if ($badCountCurrent >= 4) {
             if ($badCountPrev == 0) {
                 return [
-                    'title' => 'Sudden Behavioral Shift',
+                    'title' => 'Perubahan Perilaku Tiba-tiba',
                     'level' => 'critical',
-                    'description' => "Zero issues in prev period vs {$badCountCurrent} recently.",
-                    'metric' => "100% Increase",
+                    'description' => "Nol masalah di periode lalu vs {$badCountCurrent} saat ini.",
+                    'metric' => "Kenaikan 100%",
                 ];
             } elseif ($badCountCurrent >= ($badCountPrev * 2)) {
                 $increase = round((($badCountCurrent - $badCountPrev) / $badCountPrev) * 100);
                 return [
-                    'title' => 'Escalating Issues',
+                    'title' => 'Eskalasi Masalah',
                     'level' => 'critical',
-                    'description' => "Absence/Lateness increased widely.",
-                    'metric' => "+{$increase}% Trend",
+                    'description' => "Ketidakhadiran/Keterlambatan meningkat drastis.",
+                    'metric' => "+{$increase}% Tren",
                 ];
             }
         }
@@ -143,10 +144,10 @@ class AiAttendanceAnomalyWidget extends TableWidget
 
             if (($monFriLates / $totalLates) >= 0.6) {
                 return [
-                    'title' => 'Mon/Fri Syndrome',
+                    'title' => 'Sindrom Senin/Jumat',
                     'level' => 'warning',
-                    'description' => "Late mostly on Mon/Fri.",
-                    'metric' => "{$monFriLates}/{$totalLates} Lates",
+                    'description' => "Sering terlambat di hari Senin/Jumat.",
+                    'metric' => "{$monFriLates}/{$totalLates} Terlambat",
                 ];
             }
         }
@@ -156,16 +157,18 @@ class AiAttendanceAnomalyWidget extends TableWidget
             if ($r->clock_in && $r->clock_out) {
                 $in = Carbon::parse($r->clock_in);
                 $out = Carbon::parse($r->clock_out);
-                return $out->diffInHours($in) > 10;
+                // Use absolute difference in hours
+                $hoursWorked = $in->diffInHours($out);
+                return $hoursWorked > 10;
             }
             return false;
         });
         if ($longDays->count() >= 5) {
             return [
-                'title' => 'Burnout Risk',
+                'title' => 'Risiko Burnout',
                 'level' => 'warning',
-                'description' => "Working >10h/day frequently.",
-                'metric' => "{$longDays->count()} Long Days",
+                'description' => "Sering bekerja >10 jam/hari.",
+                'metric' => "{$longDays->count()} Hari Panjang",
             ];
         }
 

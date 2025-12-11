@@ -2,10 +2,9 @@
 
 namespace App\Filament\Hris\Resources\Devices\Schemas;
 
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Schema;
+use Filament\Forms\Components\Select;
 
 class DeviceForm
 {
@@ -14,57 +13,57 @@ class DeviceForm
         return $schema
             ->components([
                 TextInput::make('alias')
-                    ->label('Device Name')
+                    ->label('Nama Perangkat')
                     ->required(),
                 TextInput::make('sn')
-                    ->label('Serial Number')
+                    ->label('Nomor Seri')
                     ->required(),
-                \Filament\Forms\Components\Select::make('department_id')
-                    ->label('Area')
+                Select::make('department_id')
+                    ->label('Area / Departemen')
                     ->relationship('department', 'name')
                     ->searchable()
                     ->preload()
                     ->required(),
                 // Placeholder for Attendance Device dropdown (not in DB schema yet, maybe options?)
-                \Filament\Forms\Components\Select::make('options.attendance_device')
-                    ->label('Attendance Device')
+                Select::make('options.attendance_device')
+                    ->label('Perangkat Absensi')
                     ->options([
-                        'Yes' => 'Yes',
-                        'No' => 'No',
+                        'Yes' => 'Ya',
+                        'No' => 'Tidak',
                     ])
                     ->default('Yes'),
                 // Placeholder for Request Heartbeat (might be in options or hardcoded for now)
                 TextInput::make('options.heartbeat')
                     ->label('Request Heartbeat')
                     ->numeric()
-                    ->suffix('Seconds')
+                    ->suffix('Detik')
                     ->default(10)
                     ->required(),
 
                 // Right Column
                 TextInput::make('ip_address')
-                    ->label('Device IP'),
+                    ->label('Alamat IP Perangkat'),
 
-                \Filament\Forms\Components\Select::make('terminal_tz')
-                    ->label('Time Zone')
+                Select::make('terminal_tz')
+                    ->label('Zona Waktu')
                     ->options([
-                        8 => 'Etc/GMT+8',
-                        7 => 'Etc/GMT+7',
+                        8 => 'Etc/GMT+8 (WITA)',
+                        7 => 'Etc/GMT+7 (WIB)',
                     ])
                     ->default(8),
 
                 // Placeholder for Registration Device
-                \Filament\Forms\Components\Select::make('options.registration_device')
-                    ->label('Registration Device')
+                Select::make('options.registration_device')
+                    ->label('Perangkat Pendaftaran')
                     ->options([
-                        'Yes' => 'Yes',
-                        'No' => 'No',
+                        'Yes' => 'Ya',
+                        'No' => 'Tidak',
                     ])
                     ->default('No'),
 
                 // Placeholder for Transfer Mode
-                \Filament\Forms\Components\Select::make('options.transfer_mode')
-                    ->label('Transfer Mode')
+                Select::make('options.transfer_mode')
+                    ->label('Mode Transfer')
                     ->options([
                         'Real-Time' => 'Real-Time',
                         'Manual' => 'Manual',

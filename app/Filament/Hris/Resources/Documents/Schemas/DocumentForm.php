@@ -14,20 +14,23 @@ class DocumentForm
         return $schema
             ->components([
                 Select::make('type')
+                    ->label('Tipe Dokumen')
                     ->options([
-                        'Identity Card' => 'Identity Card',
-                        'Family Card' => 'Family Card',
-                        'Education Certificate' => 'Education Certificate',
-                        'Contract' => 'Contract',
-                        'Resume' => 'Resume',
-                        'Other' => 'Other',
+                        'Identity Card' => 'KTP',
+                        'Family Card' => 'Kartu Keluarga (KK)',
+                        'Education Certificate' => 'Ijazah',
+                        'Contract' => 'Kontrak Kerja',
+                        'Resume' => 'Resume / CV',
+                        'Other' => 'Lainnya',
                     ])
                     ->required(),
                 FileUpload::make('file_path')
+                    ->label('Berkas')
                     ->required()
                     ->disk('public')
                     ->directory('documents'),
                 Select::make('employee_id')
+                    ->label('Karyawan')
                     ->relationship('employee', 'first_name')
                     ->required(),
                 Hidden::make('uploaded_at')

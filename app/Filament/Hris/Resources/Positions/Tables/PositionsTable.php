@@ -15,21 +15,27 @@ class PositionsTable
         return $table
             ->columns([
                 TextColumn::make('title')
+                    ->label('Jabatan')
                     ->searchable(),
                 TextColumn::make('base_salary')
+                    ->label('Gaji Pokok')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('level')
+                    ->label('Level')
                     ->searchable(),
                 TextColumn::make('department_id')
+                    ->label('ID Departemen')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Dibuat')
+                    ->dateTime('d M Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Diperbarui')
+                    ->dateTime('d M Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

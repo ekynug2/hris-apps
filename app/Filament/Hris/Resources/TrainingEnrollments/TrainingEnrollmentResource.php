@@ -11,12 +11,13 @@ use App\Models\TrainingEnrollment;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class TrainingEnrollmentResource extends Resource
 {
-    protected static string|\UnitEnum|null $navigationGroup = "Learning";
+    protected static string|\UnitEnum|null $navigationGroup = "Learning & Development";
+    protected static ?string $modelLabel = 'Pendaftaran Pelatihan';
+    protected static ?string $pluralModelLabel = 'Pendaftaran Pelatihan';
     protected static ?string $model = TrainingEnrollment::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-book-open';

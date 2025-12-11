@@ -14,26 +14,33 @@ class AuditLogsTable
         return $table
             ->columns([
                 TextColumn::make('event_time')
-                    ->dateTime()
+                    ->label('Waktu Kejadian')
+                    ->dateTime('d M Y H:i')
                     ->sortable(),
                 TextColumn::make('event_type')
+                    ->label('Tipe Kejadian')
                     ->searchable(),
                 TextColumn::make('module')
+                    ->label('Modul')
                     ->searchable(),
                 TextColumn::make('ip_address')
+                    ->label('Alamat IP')
                     ->searchable(),
                 TextColumn::make('user_agent')
+                    ->label('User Agent')
                     ->searchable(),
                 TextColumn::make('user.name')
-                    ->label('Update by')
+                    ->label('Diperbarui Oleh')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Dibuat')
+                    ->dateTime('d M Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Diperbarui')
+                    ->dateTime('d M Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

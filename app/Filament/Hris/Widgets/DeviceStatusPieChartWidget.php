@@ -6,9 +6,9 @@ use Filament\Widgets\ChartWidget;
 
 class DeviceStatusPieChartWidget extends ChartWidget
 {
-    protected static ?int $sort = 2;
+    protected static ?int $sort = 1;  // First widget (left side)
 
-    protected ?string $heading = 'Device Status';
+    protected ?string $heading = 'Status Perangkat';
 
     protected int|string|array $columnSpan = 1;
 
@@ -34,7 +34,7 @@ class DeviceStatusPieChartWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Device Status',
+                    'label' => 'Status Perangkat',
                     'data' => [$online, $offline, $unauthorized],
                     'backgroundColor' => [
                         '#4ade80', // Green
@@ -44,7 +44,7 @@ class DeviceStatusPieChartWidget extends ChartWidget
                     'hoverOffset' => 4,
                 ],
             ],
-            'labels' => ['Online', 'Offline', 'Unauthorized'],
+            'labels' => ['Online', 'Offline', 'Tidak Terdaftar'],
         ];
     }
 

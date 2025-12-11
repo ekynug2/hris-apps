@@ -16,7 +16,9 @@ use Filament\Tables\Table;
 
 class AuditLogResource extends Resource
 {
-    protected static string|\UnitEnum|null $navigationGroup = "System Settings";
+    protected static string|\UnitEnum|null $navigationGroup = "Pengaturan Sistem";
+    protected static ?string $modelLabel = 'Audit Log';
+    protected static ?string $pluralModelLabel = 'Audit Logs';
     protected static ?string $model = AuditLog::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-list';

@@ -11,12 +11,13 @@ use App\Models\LeaveBalance;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class LeaveBalanceResource extends Resource
 {
-    protected static string|\UnitEnum|null $navigationGroup = "Time & Attendance";
+    protected static string|\UnitEnum|null $navigationGroup = "Absensi & Kehadiran";
+    protected static ?string $modelLabel = 'Saldo Cuti';
+    protected static ?string $pluralModelLabel = 'Saldo Cuti';
     protected static ?string $model = LeaveBalance::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-scale';

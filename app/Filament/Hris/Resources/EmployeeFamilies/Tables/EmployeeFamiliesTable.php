@@ -15,21 +15,27 @@ class EmployeeFamiliesTable
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->label('Nama')
                     ->searchable(),
                 TextColumn::make('relation')
+                    ->label('Hubungan')
                     ->badge(),
                 TextColumn::make('date_of_birth')
-                    ->date()
+                    ->label('Tanggal Lahir')
+                    ->date('d M Y')
                     ->sortable(),
                 TextColumn::make('employee_id')
+                    ->label('Karyawan')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Dibuat')
+                    ->dateTime('d M Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Diperbarui')
+                    ->dateTime('d M Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

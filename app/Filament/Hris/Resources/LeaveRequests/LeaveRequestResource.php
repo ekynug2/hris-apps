@@ -11,12 +11,13 @@ use App\Models\LeaveRequest;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class LeaveRequestResource extends Resource
 {
-    protected static string|\UnitEnum|null $navigationGroup = "Time & Attendance";
+    protected static string|\UnitEnum|null $navigationGroup = "Absensi & Kehadiran";
+    protected static ?string $modelLabel = 'Permintaan Cuti';
+    protected static ?string $pluralModelLabel = 'Permintaan Cuti';
     protected static ?string $model = LeaveRequest::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-calendar';

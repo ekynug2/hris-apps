@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Listeners\UpdateLastLogin;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use App\Observers\GenericAuditObserver;
 use App\Models\Attendance;
@@ -21,6 +22,10 @@ use App\Models\LeaveRequest;
 use App\Models\LeaveType;
 use App\Models\OrganizationUnit;
 use App\Models\Payroll;
+use App\Models\PayrollRun;
+use App\Models\PayrollItem;
+use App\Models\Payslip;
+use App\Models\PayrollAdjustment;
 use App\Models\PerformanceReview;
 use App\Models\Permission;
 use App\Models\Position;
@@ -49,6 +54,12 @@ class AppServiceProvider extends ServiceProvider
             UpdateLastLogin::class,
         );
 
+        // Register policies for new models
+        Gate::policy(PayrollRun::class, \App\Policies\PayrollRunPolicy::class);
+        Gate::policy(PayrollItem::class, \App\Policies\PayrollItemPolicy::class);
+        Gate::policy(Payslip::class, \App\Policies\PayslipPolicy::class);
+        Gate::policy(PayrollAdjustment::class, \App\Policies\PayrollAdjustmentPolicy::class);
+
         // List of models to observe
         $models = [
             Attendance::class,
@@ -65,6 +76,10 @@ class AppServiceProvider extends ServiceProvider
             LeaveType::class,
             OrganizationUnit::class,
             Payroll::class,
+            PayrollRun::class,
+            PayrollItem::class,
+            Payslip::class,
+            PayrollAdjustment::class,
             PerformanceReview::class,
             Permission::class,
             Position::class,
@@ -79,3 +94,4 @@ class AppServiceProvider extends ServiceProvider
         }
     }
 }
+

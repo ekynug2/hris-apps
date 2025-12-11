@@ -16,7 +16,9 @@ use Filament\Tables\Table;
 
 class DeviceResource extends Resource
 {
-    protected static string|\UnitEnum|null $navigationGroup = "System Settings";
+    protected static string|\UnitEnum|null $navigationGroup = "Pengaturan Sistem";
+    protected static ?string $modelLabel = 'Perangkat';
+    protected static ?string $pluralModelLabel = 'Perangkat';
     protected static ?string $model = Device::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-computer-desktop';

@@ -14,20 +14,25 @@ class UserForm
         return $schema
             ->components([
                 TextInput::make('name')
+                    ->label('Nama')
                     ->required(),
                 TextInput::make('email')
-                    ->label('Email address')
+                    ->label('Alamat Email')
                     ->email()
                     ->required(),
                 TextInput::make('password')
+                    ->label('Kata Sandi')
                     ->password()
                     ->required(),
                 Toggle::make('is_active')
+                    ->label('Aktif')
                     ->required(),
                 Select::make('employee_id')
+                    ->label('Karyawan Terkait')
                     ->relationship('employee', 'first_name')
                     ->required(),
                 Select::make('role_id')
+                    ->label('Peran (Role)')
                     ->relationship('role', 'name')
                     ->required(),
             ]);

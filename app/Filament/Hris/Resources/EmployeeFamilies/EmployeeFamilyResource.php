@@ -16,7 +16,9 @@ use Filament\Tables\Table;
 
 class EmployeeFamilyResource extends Resource
 {
-    protected static string|\UnitEnum|null $navigationGroup = "HR Management";
+    protected static string|\UnitEnum|null $navigationGroup = "Manajemen SDM";
+    protected static ?string $modelLabel = 'Keluarga Karyawan';
+    protected static ?string $pluralModelLabel = 'Keluarga Karyawan';
     protected static ?string $model = EmployeeFamily::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-user-group';

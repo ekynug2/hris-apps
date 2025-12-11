@@ -15,22 +15,28 @@ class PerformanceReviewsTable
         return $table
             ->columns([
                 TextColumn::make('review_period')
+                    ->label('Periode Review')
                     ->searchable(),
                 TextColumn::make('rating')
+                    ->label('Penilaian (Skor)')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('employee_id')
+                    ->label('ID Karyawan')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('reviewer_id')
+                    ->label('ID Penilai')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Dibuat')
+                    ->dateTime('d M Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Diperbarui')
+                    ->dateTime('d M Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

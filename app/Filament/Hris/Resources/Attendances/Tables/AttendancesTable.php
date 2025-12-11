@@ -11,6 +11,9 @@ use Filament\Tables\Table;
 use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\DatePicker;
 use Illuminate\Database\Eloquent\Builder;
+use pxlrbt\FilamentExcel\Columns\Column;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 
 class AttendancesTable
 {
@@ -22,16 +25,18 @@ class AttendancesTable
                     ->label('NIK')
                     ->searchable(),
                 TextColumn::make('employee.first_name')
-                    ->label('Name')
+                    ->label('Nama')
                     ->searchable(),
                 TextColumn::make('date')
-                    ->date()
+                    ->label('Tanggal')
+                    ->date('d M Y')
                     ->sortable(),
                 TextColumn::make('clock_in')
-                    ->time()
+                    ->label('Jam Masuk')
+                    ->time('H:i')
                     ->sortable(),
                 TextColumn::make('clock_in_method')
-                    ->label('In Method')
+                    ->label('Metode Masuk')
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         'Fingerprint' => 'success',
@@ -42,10 +47,11 @@ class AttendancesTable
                     })
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('clock_out')
-                    ->time()
+                    ->label('Jam Keluar')
+                    ->time('H:i')
                     ->sortable(),
                 TextColumn::make('clock_out_method')
-                    ->label('Out Method')
+                    ->label('Metode Keluar')
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         'Fingerprint' => 'success',
@@ -56,25 +62,30 @@ class AttendancesTable
                     })
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('status')
-                    ->badge(),
+                    ->label('Status')
+                    ->badge()
+                    ->color('success'),
                 //TextColumn::make('lat')
                 //    ->searchable(),
                 //TextColumn::make('lng')
                 //    ->searchable(),
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Dibuat')
+                    ->dateTime('d M Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Diperbarui')
+                    ->dateTime('d M Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Filter::make('date_range')
+                    ->label('Rentang Tanggal')
                     ->form([
-                        DatePicker::make('date_from'),
-                        DatePicker::make('date_to'),
+                        DatePicker::make('date_from')->label('Dari Tanggal'),
+                        DatePicker::make('date_to')->label('Sampai Tanggal'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
@@ -90,20 +101,20 @@ class AttendancesTable
             ])
             ->persistFiltersInSession()
             ->headerActions([
-                \pxlrbt\FilamentExcel\Actions\Tables\ExportAction::make()
+                ExportAction::make()
                     ->exports([
-                        \pxlrbt\FilamentExcel\Exports\ExcelExport::make()
+                        ExcelExport::make()
                             ->fromTable()
                             ->withFilename('attendances-' . date('Y-m-d-H-i-s'))
                             ->withColumns([
-                                \pxlrbt\FilamentExcel\Columns\Column::make('employee.nik')->heading('NIK'),
-                                \pxlrbt\FilamentExcel\Columns\Column::make('employee.first_name')->heading('Name'),
-                                \pxlrbt\FilamentExcel\Columns\Column::make('date')->heading('Date'),
-                                \pxlrbt\FilamentExcel\Columns\Column::make('clock_in')->heading('Clock In'),
-                                \pxlrbt\FilamentExcel\Columns\Column::make('clock_in_method')->heading('In Method'),
-                                \pxlrbt\FilamentExcel\Columns\Column::make('clock_out')->heading('Clock Out'),
-                                \pxlrbt\FilamentExcel\Columns\Column::make('clock_out_method')->heading('Out Method'),
-                                \pxlrbt\FilamentExcel\Columns\Column::make('status')->heading('Status'),
+                                Column::make('employee.nik')->heading('NIK'),
+                                Column::make('employee.first_name')->heading('Nama'),
+                                Column::make('date')->heading('Tanggal'),
+                                Column::make('clock_in')->heading('Jam Masuk'),
+                                Column::make('clock_in_method')->heading('Metode Masuk'),
+                                Column::make('clock_out')->heading('Jam Keluar'),
+                                Column::make('clock_out_method')->heading('Metode Keluar'),
+                                Column::make('status')->heading('Status'),
                             ]),
                         /*
                         ->modifyQueryUsing(function ($query) {

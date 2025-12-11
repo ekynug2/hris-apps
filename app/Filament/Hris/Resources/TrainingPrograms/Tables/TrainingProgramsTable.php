@@ -15,21 +15,27 @@ class TrainingProgramsTable
         return $table
             ->columns([
                 TextColumn::make('title')
+                    ->label('Nama Program')
                     ->searchable(),
                 TextColumn::make('start_date')
-                    ->date()
+                    ->label('Tanggal Mulai')
+                    ->date('d M Y')
                     ->sortable(),
                 TextColumn::make('end_date')
-                    ->date()
+                    ->label('Tanggal Selesai')
+                    ->date('d M Y')
                     ->sortable(),
                 TextColumn::make('location')
+                    ->label('Lokasi')
                     ->searchable(),
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Dibuat')
+                    ->dateTime('d M Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Diperbarui')
+                    ->dateTime('d M Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

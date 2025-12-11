@@ -11,15 +11,16 @@ use App\Models\OrganizationUnit;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class OrganizationUnitResource extends Resource
 {
-    protected static string|\UnitEnum|null $navigationGroup = "Organization";
+    protected static ?string $modelLabel = 'Unit Organisasi';
+    protected static ?string $pluralModelLabel = 'Unit Organisasi';
     protected static ?string $model = OrganizationUnit::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-building-office-2';
+    protected static string|\UnitEnum|null $navigationGroup = "Organisasi";
 
     public static function form(Schema $schema): Schema
     {

@@ -11,12 +11,13 @@ use App\Models\LeaveType;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class LeaveTypeResource extends Resource
 {
-    protected static string|\UnitEnum|null $navigationGroup = "Time & Attendance";
+    protected static string|\UnitEnum|null $navigationGroup = "Absensi & Kehadiran";
+    protected static ?string $modelLabel = 'Tipe Cuti';
+    protected static ?string $pluralModelLabel = 'Tipe Cuti';
     protected static ?string $model = LeaveType::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-tag';

@@ -11,12 +11,13 @@ use App\Models\Employee;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class EmployeeResource extends Resource
 {
-    protected static string|\UnitEnum|null $navigationGroup = "HR Management";
+    protected static string|\UnitEnum|null $navigationGroup = "Manajemen SDM";
+    protected static ?string $modelLabel = 'Karyawan';
+    protected static ?string $pluralModelLabel = 'Karyawan';
     protected static ?string $model = Employee::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-users';

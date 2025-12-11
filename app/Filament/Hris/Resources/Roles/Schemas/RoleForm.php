@@ -17,8 +17,10 @@ class RoleForm
     {
         $components = [
             TextInput::make('name')
+                ->label('Nama Peran')
                 ->required(),
             Textarea::make('description')
+                ->label('Deskripsi')
                 ->default(null)
                 ->columnSpanFull(),
         ];

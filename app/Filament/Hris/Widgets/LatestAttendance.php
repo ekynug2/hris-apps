@@ -24,20 +24,30 @@ class LatestAttendance extends BaseWidget
             )
             ->columns([
                 Tables\Columns\TextColumn::make('employee.first_name')
-                    ->label('Employee')
+                    ->label('Karyawan')
                     ->description(fn(Attendance $record) => $record->employee->nik),
                 Tables\Columns\TextColumn::make('date')
-                    ->date(),
+                    ->label('Tanggal')
+                    ->date('d M Y'),
                 Tables\Columns\TextColumn::make('clock_in')
+                    ->label('Masuk')
                     ->time(),
                 Tables\Columns\TextColumn::make('clock_out')
+                    ->label('Keluar')
                     ->time(),
                 Tables\Columns\BadgeColumn::make('status')
+                    ->label('Status')
                     ->colors([
                         'success' => 'present',
                         'warning' => 'late',
                         'danger' => 'absent',
-                    ]),
+                    ])
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                        'present' => 'Hadir',
+                        'late' => 'Terlambat',
+                        'absent' => 'Absen',
+                        default => $state,
+                    }),
             ]);
     }
 }

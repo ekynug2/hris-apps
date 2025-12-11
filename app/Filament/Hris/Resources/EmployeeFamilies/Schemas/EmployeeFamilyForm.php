@@ -13,14 +13,18 @@ class EmployeeFamilyForm
         return $schema
             ->components([
                 Select::make('name')
+                    ->label('Nama')
                     ->relationship('employee', 'first_name')
                     ->required(),
                 Select::make('relation')
-                    ->options(['spouse' => 'Spouse', 'child' => 'Child', 'parent' => 'Parent'])
+                    ->label('Hubungan')
+                    ->options(['spouse' => 'Pasangan', 'child' => 'Anak', 'parent' => 'Orang Tua'])
                     ->required(),
                 DatePicker::make('date_of_birth')
+                    ->label('Tanggal Lahir')
                     ->required(),
                 Select::make('employee_id')
+                    ->label('Karyawan')
                     ->relationship('employee', 'first_name')
                     ->required(),
             ]);

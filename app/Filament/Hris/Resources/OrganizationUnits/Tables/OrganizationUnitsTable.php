@@ -15,18 +15,23 @@ class OrganizationUnitsTable
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->label('Nama Unit')
                     ->searchable(),
                 TextColumn::make('type')
+                    ->label('Tipe')
                     ->searchable(),
                 TextColumn::make('parent_id')
+                    ->label('Unit Induk')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Dibuat')
+                    ->dateTime('d M Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Diperbarui')
+                    ->dateTime('d M Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

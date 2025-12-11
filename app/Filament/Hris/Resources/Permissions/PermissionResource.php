@@ -11,12 +11,13 @@ use App\Models\Permission;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class PermissionResource extends Resource
 {
-    protected static string|\UnitEnum|null $navigationGroup = "System Settings";
+    protected static string|\UnitEnum|null $navigationGroup = "Pengaturan Sistem";
+    protected static ?string $modelLabel = 'Izin (Permission)';
+    protected static ?string $pluralModelLabel = 'Izin (Permissions)';
     protected static ?string $model = Permission::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-key';

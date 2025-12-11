@@ -14,15 +14,19 @@ class TrainingEnrollmentForm
         return $schema
             ->components([
                 Select::make('status')
-                    ->options(['registered' => 'Registered', 'completed' => 'Completed', 'failed' => 'Failed'])
+                    ->label('Status')
+                    ->options(['registered' => 'Terdaftar', 'completed' => 'Selesai', 'failed' => 'Gagal'])
                     ->required(),
                 Textarea::make('certificate_url')
+                    ->label('URL Sertifikat')
                     ->default(null)
                     ->columnSpanFull(),
                 TextInput::make('employee_id')
+                    ->label('ID Karyawan')
                     ->required()
                     ->numeric(),
                 TextInput::make('training_id')
+                    ->label('ID Pelatihan')
                     ->required()
                     ->numeric(),
             ]);

@@ -16,7 +16,9 @@ use Filament\Tables\Table;
 
 class DocumentResource extends Resource
 {
-    protected static string|\UnitEnum|null $navigationGroup = "HR Management";
+    protected static string|\UnitEnum|null $navigationGroup = "Manajemen SDM";
+    protected static ?string $modelLabel = 'Dokumen';
+    protected static ?string $pluralModelLabel = 'Dokumen';
     protected static ?string $model = Document::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-text';

@@ -9,9 +9,11 @@ use Illuminate\Support\Facades\DB;
 
 class AttendanceTrend extends ChartWidget
 {
-    protected ?string $heading = 'Attendance Trend (Last 7 Days)';
+    protected ?string $heading = 'Tren Kehadiran (7 Hari Terakhir)';
 
-    protected static ?int $sort = 2;
+    protected static ?int $sort = 1;  // First row
+
+    protected int|string|array $columnSpan = 1;  // Keep original size
 
     protected function getData(): array
     {
@@ -34,11 +36,11 @@ class AttendanceTrend extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Present Employees',
+                    'label' => 'Karyawan Hadir',
                     'data' => $presentCounts->toArray(),
                     'fill' => 'start',
-                    'backgroundColor' => 'rgba(245, 158, 11, 0.2)', // Amber
-                    'borderColor' => 'rgb(245, 158, 11)',
+                    'backgroundColor' => 'rgba(34, 197, 94, 0.25)', // Soft green
+                    'borderColor' => 'rgba(22, 163, 74, 1)',
                 ],
             ],
             'labels' => $dates->toArray(),

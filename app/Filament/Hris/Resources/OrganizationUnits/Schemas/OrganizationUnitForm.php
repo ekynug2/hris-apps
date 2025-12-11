@@ -13,13 +13,17 @@ class OrganizationUnitForm
         return $schema
             ->components([
                 TextInput::make('name')
+                    ->label('Nama Unit')
                     ->required(),
                 TextInput::make('type')
+                    ->label('Tipe')
                     ->required(),
                 TextInput::make('parent_id')
+                    ->label('Unit Induk')
                     ->numeric()
                     ->default(null),
                 Textarea::make('meta')
+                    ->label('Meta Data')
                     ->default(null)
                     ->columnSpanFull(),
             ]);

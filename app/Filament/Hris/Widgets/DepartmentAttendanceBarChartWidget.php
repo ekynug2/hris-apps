@@ -8,7 +8,7 @@ class DepartmentAttendanceBarChartWidget extends ChartWidget
 {
     protected static ?int $sort = 3;
 
-    protected ?string $heading = 'Department Attendance Statistics';
+    protected ?string $heading = 'Statistik Kehadiran Departemen';
 
     protected int|string|array $columnSpan = 'full';
 
@@ -25,7 +25,7 @@ class DepartmentAttendanceBarChartWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Attendance',
+                    'label' => 'Kehadiran',
                     'data' => $departments->pluck('present_count')->toArray(),
                     'backgroundColor' => '#d1d5db', // Grayish color as seen in the image (or similar)
                     'barThickness' => 30,

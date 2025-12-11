@@ -15,34 +15,44 @@ class LeaveRequestsTable
         return $table
             ->columns([
                 TextColumn::make('start_date')
-                    ->date()
+                    ->label('Mulai')
+                    ->date('d M Y')
                     ->sortable(),
                 TextColumn::make('end_date')
-                    ->date()
+                    ->label('Selesai')
+                    ->date('d M Y')
                     ->sortable(),
                 TextColumn::make('total_days')
+                    ->label('Total Hari')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('status')
+                    ->label('Status')
                     ->badge(),
                 TextColumn::make('employee_id')
+                    ->label('ID Karyawan')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('leave_type_id')
+                    ->label('Tipe Cuti')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('approved_by')
+                    ->label('Disetujui Oleh')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('backup_approver_id')
+                    ->label('Penyetuju Cadangan')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Dibuat')
+                    ->dateTime('d M Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Diperbarui')
+                    ->dateTime('d M Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

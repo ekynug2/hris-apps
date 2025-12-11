@@ -35,11 +35,16 @@ class HrisPanelProvider extends PanelProvider
             ->font('Poppins')
             ->sidebarCollapsibleOnDesktop()
             ->maxContentWidth('full')
+            ->darkMode(true)
             ->renderHook(
                 'panels::body.end',
                 fn() => '<script src="/js/clean-url.js"></script>',
             )
             ->discoverResources(in: app_path('Filament/Hris/Resources'), for: Resources::class)
+            ->resources([
+                \App\Filament\Hris\Resources\PayrollRuns\PayrollRunResource::class,
+                \App\Filament\Hris\Resources\Payslips\PayslipResource::class,
+            ])
             ->discoverPages(in: app_path('Filament/Hris/Pages'), for: Pages::class)
             ->pages([
                 Dashboard::class,

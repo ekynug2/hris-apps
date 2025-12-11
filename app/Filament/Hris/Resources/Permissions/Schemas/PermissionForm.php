@@ -13,8 +13,10 @@ class PermissionForm
         return $schema
             ->components([
                 TextInput::make('name')
+                    ->label('Nama Izin')
                     ->required(),
                 Textarea::make('description')
+                    ->label('Deskripsi')
                     ->default(null)
                     ->columnSpanFull(),
             ]);
